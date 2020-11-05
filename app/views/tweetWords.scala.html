@@ -1,0 +1,26 @@
+
+@import play.mvc.Http.Request
+@(myMap: Map[String, Long])(implicit assetsFinder: AssetsFinder)
+@import helper._
+@main("Welcome to tweeterLytics"){
+    <h1><center>Tweet Words Statistics</center></h1>
+    <section class="w3-container w3-center">
+    @for((k,v) <- myMap) {
+        <div class="w3-card-4 w3-center w3-round-large" style="width:50%;  margin: 10px; display:inline-block; background: white;">
+
+            <div class="w3-row">
+
+                <div class="w3-center w3-col" style="width: 50%">
+                    <p>@k     :</p>
+                </div>
+
+                <div class="w3-center w3-col" style="width: 50%">
+                    <p class="w3-left">     @v     </p>
+                </div>
+
+            </div>
+
+        </div>
+    }
+    </section>
+}

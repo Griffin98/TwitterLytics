@@ -4,37 +4,30 @@ import model.SearchResults;
 import model.Tweet;
 import play.libs.oauth.OAuth.RequestToken;
 import services.TwitterAPIService;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * Common Factory class to retrieve tweets from Twitter. This class abstracts inner call to TwitterAPI service.
- * This class implements asynchronous call to TwitterAPIService using {link #Futures}.
+ * Centralized class to work with twitter.
  *
  * Singleton Pattern
  */
 public class TweetLyticsFactory {
 
-    // Instance of TweetLytics Factory class.
     private static TweetLyticsFactory INSTANCE = null;
 
-    // Twitter Consumer Key.
     public static final String API_KEY = "M9Gp7QQDVS3hwXsblhi2baSvn";
-
-    // Twitter Consumer Key Secret.
     public static final String API_KEY_SECRET = "2JR5ZlrSFwZX2PHXdccnAoAuLES6KKQvAJOWYWO54Bma7AcImh";
 
-    // Number of Tweet feeds to fetch.
     private static final int MAX_SEARCH_LIMIT = 250;
-
-    // Number of Tweets to be displayed.
     private static final int DISPLAY_LIMIT = 10;
-
-    // Instance of TwitterAPI Service. Asynchronous.
     private final CompletableFuture<TwitterAPIService> twitterAPIService;
 
     private TweetLyticsFactory(RequestToken accessToken) {
@@ -47,16 +40,14 @@ public class TweetLyticsFactory {
                 .setOAuthAccessTokenSecret(accessToken.secret);
 
         TwitterFactory twitterFactory = new TwitterFactory(cb.build());
-
         this.twitterAPIService = CompletableFuture.supplyAsync(() -> new TwitterAPIService(twitterFactory.getInstance()));
 
     }
 
     /**
-     * Method to get single instance of TweetLyticsFactory.
      *
-     * @param accessToken Twitter API AccessToken.
-     * @return instance of TweetLyticsFactory.
+     * @param accessToken
+     * @return
      */
     public static TweetLyticsFactory getInstance(RequestToken accessToken) {
 
@@ -68,9 +59,22 @@ public class TweetLyticsFactory {
     }
 
     /**
-     * Methods returns list of {link #SearchResults} asynchronously using {link #Futures}.
-     * @param keyword Keyword for which tweets need to be fetched.
-     * @return List of {link #SearchResults}.
+     *
+     * @return instance of TweetLyticsFactory(Using it in TweetWords)
+     */
+    public static TweetLyticsFactory getInstance(){
+        return INSTANCE;
+    }
+//    public List<SearchResults> getListTweetSearchResults() {
+//        return listTweetSearchResults;
+//    }
+//    public void setListTweetSearchResults(List<SearchResults> listTweetSearchResults) {
+//        this.listTweetSearchResults=listTweetSearchResults;
+//    }
+    /**
+     *
+     * @param keyword
+     * @return
      */
     public CompletableFuture<List<SearchResults>> getTweetsByKeyword(String keyword) {
 
@@ -78,15 +82,37 @@ public class TweetLyticsFactory {
             List<SearchResults> listOfSearchResults = new ArrayList<SearchResults>();
             List<Tweet> allTweets = twitter.getTweets(keyword, MAX_SEARCH_LIMIT);
 
-            // From 250 tweets fetched we wish to display only 10 tweets. So take a subset from the whole list.
+            //
             List<Tweet> tweets = allTweets.subList(0, DISPLAY_LIMIT);
 
             SearchResults res = new SearchResults(keyword, tweets);
             listOfSearchResults.add(res);
+//            if(res!=null) {
+//                listTweetSearchResults.add(0,new SearchResults(keyword, allTweets));
+//            }
             return listOfSearchResults;
         });
 
         return results;
+    }
+
+
+    /**
+     * Used to get a CompletableFuture map which stores word:frequency pairs for 250 tweets of selected search key
+     * @param searchResultsList CompletableFuture list of search results
+     * @param index index of the key
+     * @return CompletableFuture map to get word:frequency
+     */
+    public static CompletableFuture<Map<String, Long>> findStatistics(CompletableFuture<List<SearchResults>> searchResultsList, Integer index){
+        CompletableFuture<List<Tweet>> listCompletableFutureTweets = searchResultsList.thenApply(searchResults -> searchResults.get(index).getTweets());
+        return listCompletableFutureTweets.thenApply(tweets -> tweets.stream()
+                .map(Tweet::getText)
+                .flatMap(text -> Arrays.stream(text.split(" ")))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new)));
     }
 
 }

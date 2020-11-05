@@ -103,7 +103,17 @@ public class MainController extends Controller {
         searchCounter+=1;
         return CompletableFuture.completedFuture(redirect(routes.MainController.main()));
     }
-
+    public CompletionStage<Result> tweetWords(Integer index,Http.Request request) {
+        Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
+        if(!sessionTokenPair.isPresent()){
+            return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
+        }
+        if(index>searchCounter){
+            return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Please provide a valid value",assetsFinder)));
+        }
+        CompletableFuture<Map<String, Long>> futureStatistics= TweetLyticsFactory.findStatistics(searchResultsList,index);
+        return futureStatistics.thenApplyAsync(statistics->ok(views.html.tweetWords.render(statistics,assetsFinder)));
+    }
 
 
     /**
