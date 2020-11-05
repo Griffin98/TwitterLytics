@@ -1,0 +1,20 @@
+@*
+* This template takes a two arguments, a String containing a
+* message to display and an AssetsFinder to locate static assets.
+*@
+@(implicit assetsFinder: AssetsFinder)
+
+@*
+ * Call the `main` template with two arguments. The first
+ * argument is a `String` with the title of the page, the second
+ * argument is an `Html` object containing the body of the page.
+ *@
+@main("TwitterLytics") {
+
+    <header class="w3-container w3-center" style="padding:128px 16px">
+        <h1 class="w3-margin w3-xxlarge">Welcome to,</h1>
+        <h1 class="w3-myfont w3-margin w3-jumbo">TwitterLytics</h1>
+        <p class="w3-xlarge">Login to continue...</p>
+        <a href="@routes.MainController.auth" class="w3-button w3-blue w3-padding-large w3-xlarge w3-round-xlarge w3-margin-top">LOGIN</a>
+    </header>
+}
