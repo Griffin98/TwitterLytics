@@ -29,7 +29,19 @@
          <section class="w3-container w3-center">
              @for((tsr,gi) <- tweetSearchResults.zipWithIndex) {
 
-                 <h3>Search Keyword: <a href="@routes.MainController.tweetWords(gi)">@tsr.getKeyword</a>          </h3>
+                 <h3>Search Keyword: <a href="@routes.MainController.tweetWords(gi)">@tsr.getKeyword</a>@if(tsr.getOverallResult.equals(":-)")){
+                     <i class="fas fa-smile-beam" style="font-size: 30px;
+                         color: green;"></i>
+                 }
+                     @if(tsr.getOverallResult.equals(":-(")){
+                         <i class="fas fa-frown" style="font-size: 30px;
+                             color: green;"></i>
+                     }
+                     @if(tsr.getOverallResult.equals(":-|")){
+                         <i class="fas fa-meh" style="font-size: 30px;
+                             color: green;"></i>
+                     }
+                 </h3>
                  <hr/>
                  @for((tweet, index) <- tsr.getTweets.zipWithIndex) {
 
@@ -60,7 +72,18 @@
 
                              <div class="w3-center  w3-col" style="width: 20%">
                                  <p class="w3-text-gray">Sentiment</p>
-                                 <i class="fas fa-smile-beam" style="font-size: 30px; color: green;"></i>
+                                 @{
+                                     if(tweet.getTweetSentiment.get(index).contains(":-)")) {
+                                             <i class="fas fa-smile-beam" style="font-size: 30px;
+                                        color: green;"></i>
+                                     }else if(tweet.getTweetSentiment.get(index).contains(":-(")) {
+                                             <i class="fas fa-frown" style="font-size: 30px;
+                                    color: green;"></i>
+                                     }else {
+                                             <i class="fas fa-meh" style="font-size: 30px;
+                                        color: green;"></i>
+                                     }
+                                 }
                              </div>
 
                          </div>

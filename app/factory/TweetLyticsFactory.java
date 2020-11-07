@@ -85,7 +85,15 @@ public class TweetLyticsFactory {
             //
             List<Tweet> tweets = allTweets.subList(0, DISPLAY_LIMIT);
 
-            SearchResults res = new SearchResults(keyword, tweets);
+            SentimentAnalyzerFactory sentimentAnalyzerFactory = new SentimentAnalyzerFactory();
+            List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(allTweets);
+            System.out.println(resultsIndividualTweets);
+
+            String overallResult = sentimentAnalyzerFactory.getResultOfAllTweet(resultsIndividualTweets);
+
+            tweets.forEach(u -> u.setTweetSentiment(resultsIndividualTweets));
+
+            SearchResults res = new SearchResults(keyword, tweets, overallResult);
             listOfSearchResults.add(res);
 //            if(res!=null) {
 //                listTweetSearchResults.add(0,new SearchResults(keyword, allTweets));

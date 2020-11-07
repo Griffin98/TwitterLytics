@@ -6,6 +6,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -18,12 +19,16 @@ public class Tweet {
     private ArrayList<String> hashTags;
     private Date creationTime;
 
+
+    private List<String> tweetSentiment;
+
     /**
      * Instantiates a new Tweet.
      *
      * @param user         the user
      * @param text         the text
      * @param creationTime the creation time
+     * @param hashTags     the hash tags
      */
     public Tweet(User user, String text, Date creationTime, ArrayList<String> hashTags) {
         this.user = user;
@@ -86,6 +91,26 @@ public class Tweet {
         this.creationTime = creationTime;
     }
 
+
+    /**
+     * Gets tweet sentiment.
+     *
+     * @return the tweet sentiment
+     */
+    public List<String> getTweetSentiment() {
+        return tweetSentiment;
+    }
+
+    /**
+     * Sets tweet sentiment.
+     *
+     * @param tweetSentiment the tweet sentiment
+     *
+     */
+    public void setTweetSentiment(List<String> tweetSentiment) {
+        this.tweetSentiment = tweetSentiment;
+    }
+
     @Override
     public boolean equals(Object o) {
         if(o == this) return true;
@@ -100,10 +125,20 @@ public class Tweet {
         return Objects.hash(user, text, creationTime);
     }
 
+    /**
+     * Gets hash tags.
+     *
+     * @return the hash tags
+     */
     public ArrayList<String> getHashTags() {
         return hashTags;
     }
 
+    /**
+     * Sets hash tags.
+     *
+     * @param hashTags the hash tags
+     */
     public void setHashTags(ArrayList<String> hashTags) {
         this.hashTags = hashTags;
     }

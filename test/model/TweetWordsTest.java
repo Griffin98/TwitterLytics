@@ -1,4 +1,4 @@
-package models;
+package model;
 import factory.TweetLyticsFactory;
 import model.SearchResults;
 import model.Tweet;
@@ -36,7 +36,7 @@ public class TweetWordsTest extends WithApplication {
             List<Tweet> listTweet=new ArrayList<>();
             listTweet.add(tweet);
             listTweet.add(tweet1);
-            searchResultsArrayList.add(new SearchResults("random search",listTweet));
+            searchResultsArrayList.add(new SearchResults("random search",listTweet, ":-|"));
             return searchResultsArrayList;
         } );
         Map<String, Long> expectedMap1=new HashMap<>();

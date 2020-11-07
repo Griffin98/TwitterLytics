@@ -96,6 +96,16 @@ public class TweetTest {
         assertEquals(modDate, tweet.getCreationTime());
     }
 
+    @Test
+    public void testGetHashTag(){
+        assertEquals(hashTags, tweet.getHashTags());
+    }
+    @Test
+    public void testSetHashTag(){
+        ArrayList<String> dummyHashTag = new ArrayList<>();
+        tweet.setHashTags(dummyHashTag);
+        assertEquals(hashTags, tweet.getHashTags());
+    }
     /**
      * Test hash code.
      */

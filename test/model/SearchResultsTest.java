@@ -6,10 +6,7 @@ package model;/*
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -23,6 +20,7 @@ public class SearchResultsTest {
     private List<Tweet> tweetList;
     private List<Tweet> tweetList2;
     private Tweet tweet;
+    private List<String> sentiments;
 
     /**
      * Set up.
@@ -32,15 +30,18 @@ public class SearchResultsTest {
         User user = new User(1, "User", "screenName", "userprofile", "useProfile");
         Date date = new Date();
         ArrayList<String> hashTags = new ArrayList<>();
+        sentiments = new ArrayList<>();
+        sentiments.add(":-)");
         // TODO: implement test cases
         tweet = new Tweet(user, "text", date, hashTags);
+        tweet.setTweetSentiment(sentiments);
         tweetList = new ArrayList<>();
         tweetList2 = new ArrayList<>();
         tweetList.add(tweet);
         tweetList2.add(tweet);
         tweetList2.add(new Tweet(user, "text2", date, hashTags));
-        searchResults = new SearchResults("today", tweetList);
-        test = new SearchResults("today", tweetList2);
+        searchResults = new SearchResults("today", tweetList, ":-)");
+        test = new SearchResults("today", tweetList2, ":-)");
     }
 
     /**
@@ -83,6 +84,26 @@ public class SearchResultsTest {
         assertEquals(dummyTweet, searchResults.getTweets());
     }
 
+    /**
+     * Test get overall results.
+     */
+    @Test
+    public void testGetOverallResults(){
+        String str = String.join("", tweet.getTweetSentiment());
+        assertEquals(searchResults.getOverallResult(), str);
+    }
+
+    /**
+     * Test set overall results.
+     */
+    @Test
+    public void testSetOverallResults(){
+        List<String> sentiment = new ArrayList<>();
+        sentiment.add(":-)");
+        String str = String.join("", sentiment);
+        searchResults.setOverallResult(":-)");
+        assertEquals(str, searchResults.getOverallResult());
+    }
     /**
      * Test hash code.
      */

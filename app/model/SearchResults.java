@@ -14,16 +14,20 @@ public class SearchResults {
 
     private String keyword;
     private List<Tweet> tweets;
+    private String overallResult;
+
 
     /**
      * Instantiates a new Search results.
      *
-     * @param keyword         the keyword
-     * @param tweets          the tweets
+     * @param keyword       the keyword
+     * @param tweets        the tweets
+     * @param overallResult the overall result
      */
-    public SearchResults(String keyword, List<Tweet> tweets) {
+    public SearchResults(String keyword, List<Tweet> tweets, String overallResult) {
         this.keyword = keyword;
         this.tweets = tweets;
+        this.overallResult = overallResult;
     }
 
     /**
@@ -60,6 +64,25 @@ public class SearchResults {
      */
     public void setTweets(List<Tweet> tweets) {
         this.tweets = tweets;
+    }
+
+
+    /**
+     * Gets overall result.
+     *
+     * @return the overall result
+     */
+    public String getOverallResult() {
+        return overallResult;
+    }
+
+    /**
+     * Sets overall result.
+     *
+     * @param overallResult the overall result
+     */
+    public void setOverallResult(String overallResult) {
+        this.overallResult = overallResult;
     }
 
     @Override
