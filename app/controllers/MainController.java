@@ -115,6 +115,19 @@ public class MainController extends Controller {
         return futureStatistics.thenApplyAsync(statistics->ok(views.html.tweetWords.render(statistics,assetsFinder)));
     }
 
+    public CompletionStage<Result> searchHashTags(String tag, Http.Request request) {
+        Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
+
+        if(!sessionTokenPair.isPresent()){
+            return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
+        }
+        tweetLyticsFactory = TweetLyticsFactory.getInstance(sessionTokenPair.get());
+        CompletableFuture<List<SearchResults>> results = tweetLyticsFactory.getTweetsByKeyword(tag);
+        return results.thenApplyAsync(result ->
+
+                ok(views.html.hashTags.render(asScala(result), assetsFinder,request, messagesApi.preferred(request))
+                ));
+    }
 
     /**
      *

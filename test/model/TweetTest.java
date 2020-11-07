@@ -5,6 +5,7 @@ package model;/*
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
@@ -27,14 +28,18 @@ public class TweetTest {
      */
     String textTweet;
 
+    ArrayList<String> hashTags;
+
     /**
      * Set up.
      */
     @Before
     public void setUp(){
         date = new Date();
+        // TODO: implement test cases;
+        hashTags = new ArrayList<>();
         textTweet = "My name is Darshan. This is my first tweet";
-        tweet = new Tweet(new User(1, "User", "screenName", "userprofile", "useProfile"), textTweet, date);
+        tweet = new Tweet(new User(1, "User", "screenName", "userprofile", "useProfile"), textTweet, date, hashTags);
     }
 
     /**

@@ -27,10 +27,12 @@ public class TweetWordsTest extends WithApplication {
     public void TestFindStatistics(){
         CompletableFuture<List<SearchResults>> arrayListCompletableFuture = CompletableFuture.supplyAsync(() ->{
             ArrayList<SearchResults> searchResultsArrayList = new ArrayList<>();
+            // TODO: implement test cases;
+            ArrayList<String> hashTags = new ArrayList<>();
             User user = new User(111, "test", "test","test","test");
-            Tweet tweet=new Tweet(user,"test the application",new Date());
+            Tweet tweet=new Tweet(user,"test the application",new Date(), hashTags);
             User user1 = new User(110, "test1", "test1","test1","test1");
-            Tweet tweet1=new Tweet(user1,"test the application with this testcase test it well",new Date());
+            Tweet tweet1=new Tweet(user1,"test the application with this testcase test it well",new Date(), hashTags);
             List<Tweet> listTweet=new ArrayList<>();
             listTweet.add(tweet);
             listTweet.add(tweet1);

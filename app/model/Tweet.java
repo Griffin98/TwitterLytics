@@ -4,6 +4,7 @@ package model;
  * @project TweetLytics
  */
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ public class Tweet {
 
     private User user;
     private String text;
+    private ArrayList<String> hashTags;
     private Date creationTime;
 
     /**
@@ -23,10 +25,11 @@ public class Tweet {
      * @param text         the text
      * @param creationTime the creation time
      */
-    public Tweet(User user, String text, Date creationTime) {
+    public Tweet(User user, String text, Date creationTime, ArrayList<String> hashTags) {
         this.user = user;
         this.text = text;
         this.creationTime = creationTime;
+        this.hashTags = hashTags;
     }
 
     /**
@@ -95,5 +98,13 @@ public class Tweet {
     @Override
     public int hashCode() {
         return Objects.hash(user, text, creationTime);
+    }
+
+    public ArrayList<String> getHashTags() {
+        return hashTags;
+    }
+
+    public void setHashTags(ArrayList<String> hashTags) {
+        this.hashTags = hashTags;
     }
 }

@@ -35,10 +35,20 @@ public class TwitterAPIService {
 
             int i=0;
             for(Status status : statuses) {
+
+                ArrayList<String> hashTags = new ArrayList<>();
+                HashtagEntity[] tags = status.getHashtagEntities();
+                if(tags != null  && tags.length >0){
+
+                    for(HashtagEntity tag : tags) {
+                        hashTags.add("#" + tag.getText());
+                    }
+                }
+
                 User user = UserFactory.getInstance().getOrCreateUser(status.getUser().getId(), status.getUser().getName(),
                         status.getUser().getScreenName(), status.getUser().getMiniProfileImageURL(), status.getUser().getName());
 
-                Tweet tweet = new Tweet(user, status.getText(), status.getCreatedAt());
+                Tweet tweet = new Tweet(user, status.getText(), status.getCreatedAt(), hashTags);
                 result.add(tweet);
 
                 if(++i == limit)

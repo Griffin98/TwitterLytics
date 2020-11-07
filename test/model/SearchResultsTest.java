@@ -31,12 +31,14 @@ public class SearchResultsTest {
     public void setUp(){
         User user = new User(1, "User", "screenName", "userprofile", "useProfile");
         Date date = new Date();
-        tweet = new Tweet(user, "text", date);
+        ArrayList<String> hashTags = new ArrayList<>();
+        // TODO: implement test cases
+        tweet = new Tweet(user, "text", date, hashTags);
         tweetList = new ArrayList<>();
         tweetList2 = new ArrayList<>();
         tweetList.add(tweet);
         tweetList2.add(tweet);
-        tweetList2.add(new Tweet(user, "text2", date));
+        tweetList2.add(new Tweet(user, "text2", date, hashTags));
         searchResults = new SearchResults("today", tweetList);
         test = new SearchResults("today", tweetList2);
     }
