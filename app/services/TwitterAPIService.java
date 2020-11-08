@@ -62,4 +62,30 @@ public class TwitterAPIService {
 
         return result;
     }
+
+    public List<Tweet> getHomeLineById(long user_id) {
+        ArrayList<Tweet> results = new ArrayList<>();
+
+        try {
+            List<Status> statues = twitter.getUserTimeline(user_id);
+            for (Status status : statues) {
+                ArrayList<String> hashTags = new ArrayList<>();
+                HashtagEntity[] tags = status.getHashtagEntities();
+                if(tags != null  && tags.length >0){
+
+                    for(HashtagEntity tag : tags) {
+                        hashTags.add("#" + tag.getText());
+                    }
+                }
+                User user = UserFactory.getInstance().getOrCreateUser(status.getUser().getId(), status.getUser().getName(), status.getUser().getScreenName(),status.getUser().getMiniProfileImageURL(), status.getUser().getName());
+                Tweet result = new Tweet(user, status.getText(), status.getCreatedAt(),hashTags);
+                results.add(result);
+            }
+        } catch (TwitterException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return results;
+    }
 }

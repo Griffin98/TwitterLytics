@@ -12,5 +12,6 @@ GET     /twitter/auth               controllers.MainController.auth(request : Re
 #GET     /twitter/homeTimeline       controllers.MainController.homeTimeline(request: Request)
 GET     /home                       controllers.MainController.main(request : Request)
 GET     /search                     controllers.MainController.search(request :  Request)
-GET     /tweetWords               controllers.MainController.tweetWords(index: Integer,request : Request)
+GET     /tweetWords                 controllers.MainController.tweetWords(index: Integer,request : Request)
 GET     /searchHashTags             controllers.MainController.searchHashTags(tag : String, request : Request)
+GET     /userProfile                controllers.MainController.userProfile(userId: Long,request : Request)

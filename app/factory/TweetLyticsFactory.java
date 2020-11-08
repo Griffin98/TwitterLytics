@@ -123,4 +123,11 @@ public class TweetLyticsFactory {
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new)));
     }
 
+    public CompletableFuture<List<Tweet>> getUserListTweets(Long userID){
+        CompletableFuture<List<Tweet>> futureUserHomeLine=twitterAPIService.thenApply((twitterConnection)->{
+            return twitterConnection.getHomeLineById(userID);
+        });
+        return futureUserHomeLine;
+    }
+
 }

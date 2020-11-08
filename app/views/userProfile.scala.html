@@ -1,0 +1,20 @@
+@import model.Tweet
+@import model.User
+@(user:User, userHomeLine: Seq[Tweet])(implicit assetsFinder: AssetsFinder)
+@main("Welcome to your profile") {
+        <body>
+            <h1><center>Welcome @user.getUserName()</center></h1>
+            <p>User ID: @user.getUserId()</p>
+            <p>User Link: @user.getUserProfileLink()</p>
+            <p>User Screen Name: @user.getUserScreenName()</p>
+            <h2>List of tweets  :  </h2>
+            @for((uhl, index) <- userHomeLine.zipWithIndex) {
+                @if(index < 10) {
+                    <hr/>
+                    <p>Tweet @(index + 1): </p>
+                    <p>Created time: @uhl.getCreationTime</p>
+                    <p>Text: @uhl.getText</p>
+                }
+            }
+        </body>
+}

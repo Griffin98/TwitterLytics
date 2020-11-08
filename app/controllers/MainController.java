@@ -1,8 +1,11 @@
 package controllers;
 
 import factory.TweetLyticsFactory;
+import factory.UserFactory;
 import model.SearchData;
 import model.SearchResults;
+import model.Tweet;
+import model.User;
 import play.data.Form;
 import play.data.FormFactory;
 import play.i18n.MessagesApi;
@@ -127,6 +130,14 @@ public class MainController extends Controller {
 
                 ok(views.html.hashTags.render(asScala(result), assetsFinder,request, messagesApi.preferred(request))
                 ));
+    }
+
+
+    public CompletionStage<Result> userProfile(Long userID,Http.Request request) {
+        TweetLyticsFactory twitterLyticsFactory = TweetLyticsFactory.getInstance();
+        CompletableFuture<List<Tweet>> futureUserHomeLine=twitterLyticsFactory.getUserListTweets(userID);
+        User user = UserFactory.getInstance().getUserById(userID);
+        return futureUserHomeLine.thenApplyAsync(userHomeLine ->ok(views.html.userProfile.render(user, asScala(userHomeLine),assetsFinder)));
     }
 
     /**
