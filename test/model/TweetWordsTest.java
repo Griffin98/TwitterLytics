@@ -25,6 +25,7 @@ public class TweetWordsTest extends WithApplication {
      */
     @Test
     public void TestFindStatistics(){
+        TweetLyticsFactory tweetLyticsFactory = TweetLyticsFactory.getInstance(null);
         CompletableFuture<List<SearchResults>> arrayListCompletableFuture = CompletableFuture.supplyAsync(() ->{
             ArrayList<SearchResults> searchResultsArrayList = new ArrayList<>();
             // TODO: implement test cases;
@@ -49,7 +50,7 @@ public class TweetWordsTest extends WithApplication {
         expectedMap1.put("it",1L);
         expectedMap1.put("well",1L);
         try {
-            assertEquals(expectedMap1,TweetLyticsFactory.findStatistics(arrayListCompletableFuture,0).get());
+            assertEquals(expectedMap1,tweetLyticsFactory.findStatistics(arrayListCompletableFuture,0).get());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

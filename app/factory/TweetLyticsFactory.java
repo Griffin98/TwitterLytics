@@ -60,19 +60,6 @@ public class TweetLyticsFactory {
 
     /**
      *
-     * @return instance of TweetLyticsFactory(Using it in TweetWords)
-     */
-    public static TweetLyticsFactory getInstance(){
-        return INSTANCE;
-    }
-//    public List<SearchResults> getListTweetSearchResults() {
-//        return listTweetSearchResults;
-//    }
-//    public void setListTweetSearchResults(List<SearchResults> listTweetSearchResults) {
-//        this.listTweetSearchResults=listTweetSearchResults;
-//    }
-    /**
-     *
      * @param keyword
      * @return
      */
@@ -82,7 +69,6 @@ public class TweetLyticsFactory {
             List<SearchResults> listOfSearchResults = new ArrayList<SearchResults>();
             List<Tweet> allTweets = twitter.getTweets(keyword, MAX_SEARCH_LIMIT);
 
-            //
             List<Tweet> tweets = allTweets.subList(0, DISPLAY_LIMIT);
 
             SentimentAnalyzerFactory sentimentAnalyzerFactory = new SentimentAnalyzerFactory();
@@ -95,9 +81,6 @@ public class TweetLyticsFactory {
 
             SearchResults res = new SearchResults(keyword, tweets, overallResult);
             listOfSearchResults.add(res);
-//            if(res!=null) {
-//                listTweetSearchResults.add(0,new SearchResults(keyword, allTweets));
-//            }
             return listOfSearchResults;
         });
 
@@ -111,7 +94,7 @@ public class TweetLyticsFactory {
      * @param index index of the key
      * @return CompletableFuture map to get word:frequency
      */
-    public static CompletableFuture<Map<String, Long>> findStatistics(CompletableFuture<List<SearchResults>> searchResultsList, Integer index){
+    public CompletableFuture<Map<String, Long>> findStatistics(CompletableFuture<List<SearchResults>> searchResultsList, Integer index){
         CompletableFuture<List<Tweet>> listCompletableFutureTweets = searchResultsList.thenApply(searchResults -> searchResults.get(index).getTweets());
         return listCompletableFutureTweets.thenApply(tweets -> tweets.stream()
                 .map(Tweet::getText)
@@ -124,9 +107,7 @@ public class TweetLyticsFactory {
     }
 
     public CompletableFuture<List<Tweet>> getUserListTweets(Long userID){
-        CompletableFuture<List<Tweet>> futureUserHomeLine=twitterAPIService.thenApply((twitterConnection)->{
-            return twitterConnection.getHomeLineById(userID);
-        });
+        CompletableFuture<List<Tweet>> futureUserHomeLine=twitterAPIService.thenApply((twitterConnection)-> twitterConnection.getHomeLineById(userID));
         return futureUserHomeLine;
     }
 

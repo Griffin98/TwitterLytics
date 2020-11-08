@@ -104,9 +104,6 @@ public class SentimentAnalyzerFactory {
         var happyEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-)")).count();
         var sadEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-(")).count();
         var neutralEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-|")).count();
-        System.out.println(happyEmoticon);
-        System.out.println(sadEmoticon);
-        System.out.println(neutralEmoticon);
         if (happyEmoticon > sadEmoticon && happyEmoticon > neutralEmoticon){
             return ":-)";
         }else if (sadEmoticon > happyEmoticon &&  sadEmoticon > neutralEmoticon){

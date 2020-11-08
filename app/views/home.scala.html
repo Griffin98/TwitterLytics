@@ -29,17 +29,21 @@
          <section class="w3-container w3-center">
              @for((tsr,gi) <- tweetSearchResults.zipWithIndex) {
 
-                 <h3>Search Keyword: <a href="@routes.MainController.tweetWords(gi)">@tsr.getKeyword</a>@if(tsr.getOverallResult.equals(":-)")){
+                 <h3>Search Keyword: <a href="@routes.MainController.tweetWords(gi)">@tsr.getKeyword</a>, Sentiment:
+                     @if(tsr.getOverallResult.equals(":-)")){
+                     Happy
                      <i class="fas fa-smile-beam" style="font-size: 30px;
                          color: green;"></i>
                  }
                      @if(tsr.getOverallResult.equals(":-(")){
+                         Sad
                          <i class="fas fa-frown" style="font-size: 30px;
-                             color: green;"></i>
+                             color: red;"></i>
                      }
                      @if(tsr.getOverallResult.equals(":-|")){
+                         Neutral
                          <i class="fas fa-meh" style="font-size: 30px;
-                             color: green;"></i>
+                             color: orange;"></i>
                      }
                  </h3>
                  <hr/>
@@ -78,10 +82,10 @@
                                         color: green;"></i>
                                      }else if(tweet.getTweetSentiment.get(index).contains(":-(")) {
                                              <i class="fas fa-frown" style="font-size: 30px;
-                                    color: green;"></i>
+                                    color: red;"></i>
                                      }else {
                                              <i class="fas fa-meh" style="font-size: 30px;
-                                        color: green;"></i>
+                                        color: orange;"></i>
                                      }
                                  }
                              </div>
