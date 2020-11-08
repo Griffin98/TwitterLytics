@@ -29,6 +29,7 @@ public class TwitterAPIService {
         ArrayList<Tweet> result = new ArrayList<>();
 
         Query query  = new Query(keyword);
+        query.setCount(limit);
         try {
             QueryResult queryResult = twitter.search(query);
             List<Status> statuses = queryResult.getTweets();

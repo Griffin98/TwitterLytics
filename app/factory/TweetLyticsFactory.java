@@ -26,7 +26,7 @@ public class TweetLyticsFactory {
     public static final String API_KEY = "M9Gp7QQDVS3hwXsblhi2baSvn";
     public static final String API_KEY_SECRET = "2JR5ZlrSFwZX2PHXdccnAoAuLES6KKQvAJOWYWO54Bma7AcImh";
 
-    private static final int MAX_SEARCH_LIMIT = 250;
+    private static final int MAX_SEARCH_LIMIT = 100;
     private static final int DISPLAY_LIMIT = 10;
     private final CompletableFuture<TwitterAPIService> twitterAPIService;
 
