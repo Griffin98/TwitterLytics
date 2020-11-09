@@ -69,7 +69,15 @@ public class TweetLyticsFactory {
             List<SearchResults> listOfSearchResults = new ArrayList<SearchResults>();
             List<Tweet> allTweets = twitter.getTweets(keyword, MAX_SEARCH_LIMIT);
 
-            List<Tweet> tweets = allTweets.subList(0, DISPLAY_LIMIT);
+            List<Tweet> tweets = new ArrayList<>();
+
+            if(allTweets.size() >= 10) {
+                tweets = allTweets.subList(0, DISPLAY_LIMIT);
+            }
+
+            if(allTweets.size() > 0 && allTweets.size() < 10){
+                tweets = allTweets;
+            }
 
             SentimentAnalyzerFactory sentimentAnalyzerFactory = new SentimentAnalyzerFactory();
             List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(allTweets);

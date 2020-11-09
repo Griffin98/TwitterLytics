@@ -15,10 +15,7 @@ import static play.libs.Scala.asScala;
 import play.mvc.*;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -29,6 +26,8 @@ import java.util.concurrent.CompletionStage;
 public class MainController extends Controller {
 
     static final ConsumerKey KEY = new ConsumerKey(TweetLyticsFactory.API_KEY, TweetLyticsFactory.API_KEY_SECRET);
+
+    private static int SESSION_ID = 0;
 
     private static final ServiceInfo SERVICE_INFO =
             new ServiceInfo(
@@ -46,13 +45,14 @@ public class MainController extends Controller {
 
     private TweetLyticsFactory tweetLyticsFactory;
 
-    private CompletableFuture<List<SearchResults>> searchResultsList;
+    private Map<String, CompletableFuture<List<SearchResults>>> searchResultsList;
+
     @Inject
     public MainController(AssetsFinder assetsFinder, FormFactory formFactory, MessagesApi messagesApi) {
         this.assetsFinder = assetsFinder;
         this.form = formFactory.form(SearchData.class);
         this.messagesApi = messagesApi;
-        this.searchResultsList = CompletableFuture.supplyAsync(() -> new ArrayList<SearchResults>());
+        this.searchResultsList = new HashMap<>();
         searchCounter=0;
     }
 
@@ -74,10 +74,13 @@ public class MainController extends Controller {
 
     public CompletableFuture<Result> main(Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
-        if(!sessionTokenPair.isPresent()){
+        Optional<String> sessionId = request.session().get("session_id");
+
+        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()){
             return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
         }
-        return searchResultsList.thenApplyAsync(results ->
+
+        return searchResultsList.get(sessionId.get()).thenApplyAsync(results ->
                 ok(views.html.home.render(form, asScala(results), assetsFinder,request, messagesApi.preferred(request))
         ));
 
@@ -90,7 +93,9 @@ public class MainController extends Controller {
         }
 
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
-        if(!sessionTokenPair.isPresent()){
+        Optional<String> sessionId = request.session().get("session_id");
+
+        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()){
             return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
         }
 
@@ -100,17 +105,26 @@ public class MainController extends Controller {
         final SearchData data = boundForm.get();
         String searchKey = data.getSearchKey();
 
-        CompletableFuture<List<SearchResults>> result = tweetLyticsFactory.getTweetsByKeyword(searchKey);
-        searchResultsList = result.thenCombine(searchResultsList, (op1,op2) -> {
+        CompletableFuture<List<SearchResults>> oldResult = searchResultsList.get(sessionId.get());
+        CompletableFuture<List<SearchResults>> newResult = tweetLyticsFactory.getTweetsByKeyword(searchKey);
+
+        searchResultsList.put(sessionId.get(), newResult.thenCombine(oldResult, (op1,op2) -> {
+            op1.addAll(op2);
+            return op1;
+        }));
+
+        /*searchResultsList = result.thenCombine(searchResultsList, (op1,op2) -> {
            op1.addAll(op2);
            return op1;
-        });
+        });*/
         searchCounter+=1;
         return CompletableFuture.completedFuture(redirect(routes.MainController.main()));
     }
     public CompletionStage<Result> tweetWords(Integer index,Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
-        if(!sessionTokenPair.isPresent()){
+        Optional<String> sessionId = request.session().get("session_id");
+
+        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()){
             return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
         }
 
@@ -119,7 +133,7 @@ public class MainController extends Controller {
         if(index>searchCounter){
             return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Please provide a valid value",assetsFinder)));
         }
-        CompletableFuture<Map<String, Long>> futureStatistics= tweetLyticsFactory.findStatistics(searchResultsList,index);
+        CompletableFuture<Map<String, Long>> futureStatistics= tweetLyticsFactory.findStatistics(searchResultsList.get(sessionId.get()),index);
         return futureStatistics.thenApplyAsync(statistics->ok(views.html.tweetWords.render(statistics,assetsFinder)));
     }
 
@@ -170,7 +184,11 @@ public class MainController extends Controller {
                         s-> {
                             RequestToken requestToken = getSessionTokenPair(request).get();
                             RequestToken accessToken = TWITTER.retrieveAccessToken(requestToken, s);
+                            SESSION_ID++;
+                            String id = "Session:"+SESSION_ID;
+                            searchResultsList.put(id, CompletableFuture.supplyAsync(() -> new ArrayList<SearchResults>()));
                             return redirect(routes.MainController.main())
+                                    .addingToSession(request, "session_id", id)
                                     .addingToSession(request, "token", accessToken.token)
                                     .addingToSession(request, "secret", accessToken.secret);
                         })
