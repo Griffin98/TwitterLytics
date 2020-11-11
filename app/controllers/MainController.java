@@ -113,10 +113,6 @@ public class MainController extends Controller {
             return op1;
         }));
 
-        /*searchResultsList = result.thenCombine(searchResultsList, (op1,op2) -> {
-           op1.addAll(op2);
-           return op1;
-        });*/
         searchCounter+=1;
         return CompletableFuture.completedFuture(redirect(routes.MainController.main()));
     }
@@ -124,15 +120,16 @@ public class MainController extends Controller {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         Optional<String> sessionId = request.session().get("session_id");
 
-        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()){
-            return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
+        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()) {
+            return CompletableFuture.supplyAsync(() -> badRequest(views.html.errorView.render("Invalid session", assetsFinder)));
         }
-
-        tweetLyticsFactory = TweetLyticsFactory.getInstance(sessionTokenPair.get());
 
         if(index>searchCounter){
             return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Please provide a valid value",assetsFinder)));
         }
+
+        tweetLyticsFactory = TweetLyticsFactory.getInstance(sessionTokenPair.get());
+
         CompletableFuture<Map<String, Long>> futureStatistics= tweetLyticsFactory.findStatistics(searchResultsList.get(sessionId.get()),index);
         return futureStatistics.thenApplyAsync(statistics->ok(views.html.tweetWords.render(statistics,assetsFinder)));
     }
