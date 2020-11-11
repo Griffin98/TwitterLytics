@@ -4,8 +4,6 @@ import model.SearchResults;
 import model.Tweet;
 import play.libs.oauth.OAuth.RequestToken;
 import services.TwitterAPIService;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -15,19 +13,23 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Centralized class to work with twitter.
- *
- * Singleton Pattern
+ * This factory class provide unified way to perform asynchronous function call to
+ * {@link TwitterAPIService} using {@link CompletableFuture}.
+ * 
  */
 public class TweetLyticsFactory {
 
     private static TweetLyticsFactory INSTANCE = null;
 
+    // Twitter Consumer Key.
     public static final String API_KEY = "M9Gp7QQDVS3hwXsblhi2baSvn";
+
+    // Twitter Consumer Key Secret.
     public static final String API_KEY_SECRET = "2JR5ZlrSFwZX2PHXdccnAoAuLES6KKQvAJOWYWO54Bma7AcImh";
 
+    // Numbers of tweets to fetch. Max is 100.
     private static final int MAX_SEARCH_LIMIT = 100;
-    private static final int DISPLAY_LIMIT = 10;
+
     private final CompletableFuture<TwitterAPIService> twitterAPIService;
 
     private TweetLyticsFactory(RequestToken accessToken) {
@@ -45,11 +47,14 @@ public class TweetLyticsFactory {
     }
 
     /**
-     *
-     * @param accessToken
-     * @return
+     * Method to get single instance of class
+     * @param accessToken OAUTH access toke from the twitter.
+     * @return instance of {@link TweetLyticsFactory}
      */
     public static TweetLyticsFactory getInstance(RequestToken accessToken) {
+
+        if(accessToken == null && !(accessToken instanceof RequestToken))
+            throw new NullPointerException("Invalid token specified");
 
         if (INSTANCE == null) {
             INSTANCE = new TweetLyticsFactory(accessToken);
@@ -59,9 +64,9 @@ public class TweetLyticsFactory {
     }
 
     /**
-     *
-     * @param keyword
-     * @return
+     * Method to get list of {@link SearchResults} asynchronously using {@link CompletableFuture}.
+     * @param keyword keyword for which tweets need to be searched.
+     * @return completable future list of {@link SearchResults}.
      */
     public CompletableFuture<List<SearchResults>> getTweetsByKeyword(String keyword) {
 
@@ -101,6 +106,11 @@ public class TweetLyticsFactory {
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new)));
     }
 
+    /**
+     * Method provides the list of tweets by the specified user.
+     * @param userID twitter id of the user.
+     * @return completable future list of {@link Tweet}.
+     */
     public CompletableFuture<List<Tweet>> getUserListTweets(Long userID){
         CompletableFuture<List<Tweet>> futureUserHomeLine=twitterAPIService.thenApply((twitterConnection)-> twitterConnection.getHomeLineById(userID));
         return futureUserHomeLine;

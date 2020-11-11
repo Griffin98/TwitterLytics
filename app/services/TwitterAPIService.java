@@ -9,25 +9,35 @@ import model.User;
 import twitter4j.*;
 
 /**
- *
+ * Core class which perform API call to Twitter using Twitter4j. This class
+ * encapsulates twitter4j responses into {@link Tweet}.
  */
 public class TwitterAPIService {
 
+    // Instance of Twitter object (see: twitter4j).
     private Twitter twitter;
 
+    /**
+     * Constructor to obtain instance of {@link TwitterAPIService} class.
+     * @param twitter instance of {@link Twitter}
+     */
     public TwitterAPIService(Twitter twitter) {
+        if(twitter == null && ! (twitter instanceof Twitter))
+            throw new NullPointerException("");
         this.twitter = twitter;
     }
 
     /**
-     *
-     * @param keyword
-     * @return
+     * Method to fetch list of {@link Tweet} from Twitter.
+     * @param keyword keyword for which tweets need to be fetched.
+     * @param limit number of tweets to fetch.
+     * @return list of {@link Tweet}
      */
     public List<Tweet> getTweets(String keyword, int limit) {
 
         ArrayList<Tweet> result = new ArrayList<>();
 
+        // Set the query with limit of tweet to fetch.
         Query query  = new Query(keyword);
         query.setCount(limit);
         try {
@@ -35,8 +45,11 @@ public class TwitterAPIService {
             List<Status> statuses = queryResult.getTweets();
 
             int i=0;
+
+            // Encapsulates result into Tweet.
             for(Status status : statuses) {
 
+                // Obtain hashtags from tweet too.
                 ArrayList<String> hashTags = new ArrayList<>();
                 HashtagEntity[] tags = status.getHashtagEntities();
                 if(tags != null  && tags.length >0){
@@ -57,13 +70,17 @@ public class TwitterAPIService {
             }
 
         } catch (TwitterException e) {
-            e.printStackTrace();
             return null;
         }
 
         return result;
     }
 
+    /**
+     * Method provides list of tweet by the user.
+     * @param user_id twitter user id of the user.
+     * @return list of {@link Tweet}
+     */
     public List<Tweet> getHomeLineById(long user_id) {
         ArrayList<Tweet> results = new ArrayList<>();
 
@@ -83,7 +100,6 @@ public class TwitterAPIService {
                 results.add(result);
             }
         } catch (TwitterException e) {
-            e.printStackTrace();
             return null;
         }
 
