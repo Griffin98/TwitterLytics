@@ -6,7 +6,7 @@ import model.User;
 import org.junit.Test;
 import play.Application;
 import play.inject.guice.GuiceApplicationBuilder;
-import play.libs.oauth.OAuth;
+import play.libs.oauth.OAuth.RequestToken;
 import play.test.WithApplication;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +25,8 @@ public class TweetWordsTest extends WithApplication {
      */
     @Test
     public void TestFindStatistics(){
-        TweetLyticsFactory tweetLyticsFactory = TweetLyticsFactory.getInstance(null);
+        RequestToken requestToken = new RequestToken("","");
+        TweetLyticsFactory tweetLyticsFactory = TweetLyticsFactory.getInstance(requestToken);
         CompletableFuture<List<SearchResults>> arrayListCompletableFuture = CompletableFuture.supplyAsync(() ->{
             ArrayList<SearchResults> searchResultsArrayList = new ArrayList<>();
             // TODO: implement test cases;
