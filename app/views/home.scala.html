@@ -49,50 +49,53 @@
                  <hr/>
                  @for((tweet, index) <- tsr.getTweets.zipWithIndex) {
 
-                     <div class="w3-card-4 w3-center w3-round-large" style="width:50%;  margin: 10px; display:inline-block; background: white;">
+                     @if(index < 10) {
+                         <div class="w3-card-4 w3-center w3-round-large" style="width:50%;  margin: 10px; display:inline-block; background: white;">
 
-                         <div class="w3-row">
+                             <div class="w3-row">
 
-                             <div class="w3-center w3-col" style="width: 20%">
-                                 <p class="w3-text-gray">User</p>
-                                 <img src="@tweet.getUser.getUserProfileImage" alt="Avatar" class="w3-circle"><br/>
-                                 <p><a href="@routes.MainController.userProfile(tweet.getUser().getUserId())">@tweet.getUser.getUserScreenName</a></p>
-                             </div>
+                                 <div class="w3-center w3-col" style="width: 20%">
+                                     <p class="w3-text-gray">User</p>
+                                     <img src="@tweet.getUser.getUserProfileImage" alt="Avatar" class="w3-circle"><br/>
+                                     <p><a href="@routes.MainController.userProfile(tweet.getUser().getUserId())">@tweet.getUser.getUserScreenName</a></p>
+                                 </div>
 
-                             <div class="w3-center w3-col" style="width: 60%">
-                                 <p class="w3-text-gray">Tweet</p>
-                                 <p class="w3-left">Text: @tweet.getText</p>
-                                 <p class="w3-left"> HashTags:
-                                     @for((tag, index) <- tweet.getHashTags.zipWithIndex) {
+                                 <div class="w3-center w3-col" style="width: 60%">
+                                     <p class="w3-text-gray">Tweet</p>
+                                     <p class="w3-left">Text: @tweet.getText</p>
+                                     <p class="w3-left"> HashTags:
+                                         @for((tag, index) <- tweet.getHashTags.zipWithIndex) {
 
-                                         @if( index == ( tweet.getHashTags.size() - 1 )) {
-                                             <a href="@routes.MainController.searchHashTags(tag)">@tag</a>
-                                         } else {
-                                             <a href="@routes.MainController.searchHashTags(tag)">@tag</a>,
+                                             @if( index == ( tweet.getHashTags.size() - 1 )) {
+                                                 <a href="@routes.MainController.searchHashTags(tag)">@tag</a>
+                                             } else {
+                                                 <a href="@routes.MainController.searchHashTags(tag)">@tag</a>,
+                                             }
+                                         }
+                                     </p>
+                                 </div>
+
+                                 <div class="w3-center  w3-col" style="width: 20%">
+                                     <p class="w3-text-gray">Sentiment</p>
+                                     @{
+                                         if(tweet.getTweetSentiment.get(index).contains(":-)")) {
+                                                 <i class="fas fa-smile-beam" style="font-size: 30px;
+                                        color: green;"></i>
+                                         }else if(tweet.getTweetSentiment.get(index).contains(":-(")) {
+                                                 <i class="fas fa-frown" style="font-size: 30px;
+                                    color: red;"></i>
+                                         }else {
+                                                 <i class="fas fa-meh" style="font-size: 30px;
+                                        color: orange;"></i>
                                          }
                                      }
-                                 </p>
-                             </div>
+                                 </div>
 
-                             <div class="w3-center  w3-col" style="width: 20%">
-                                 <p class="w3-text-gray">Sentiment</p>
-                                 @{
-                                     if(tweet.getTweetSentiment.get(index).contains(":-)")) {
-                                             <i class="fas fa-smile-beam" style="font-size: 30px;
-                                        color: green;"></i>
-                                     }else if(tweet.getTweetSentiment.get(index).contains(":-(")) {
-                                             <i class="fas fa-frown" style="font-size: 30px;
-                                    color: red;"></i>
-                                     }else {
-                                             <i class="fas fa-meh" style="font-size: 30px;
-                                        color: orange;"></i>
-                                     }
-                                 }
                              </div>
 
                          </div>
+                     }
 
-                     </div>
                  }
 
              }
