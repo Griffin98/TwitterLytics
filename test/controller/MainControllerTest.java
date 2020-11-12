@@ -188,21 +188,21 @@ public class MainControllerTest extends WithApplication {
         });
     }
     @Test
-    public void testSearchHashTagsPass() {
-//        Map<String,String> sessionMap=new HashMap<>();
-//        sessionMap.put("token","test");
-//        sessionMap.put("secret","test");
-//        sessionMap.put("session_id","session_id_test");
-//        Helpers.running(Helpers.fakeApplication(), () -> {
-//            Http.RequestBuilder request = new Http.RequestBuilder()
-//                    .method("GET")
-//                    .session(sessionMap)
-//                    .uri("/searchHashTags");
-//
-//            Result result = Helpers.route(application, request);
-//            assertEquals(OK, result.status());
-//
-//        });
+    public void testBadSearchHashTagsPass() {
+        Map<String,String> sessionMap=new HashMap<>();
+        sessionMap.put("token","test");
+        sessionMap.put("secret","test");
+        sessionMap.put("session_id","session_id_test");
+        Helpers.running(Helpers.fakeApplication(), () -> {
+            Http.RequestBuilder request = new Http.RequestBuilder()
+                    .method("GET")
+                    .session(sessionMap)
+                    .uri("/searchHashTags");
+
+            Result result = Helpers.route(application, request);
+            assertEquals(400, result.status());
+
+        });
     }
     @Test
     public void testUserProfileBadRequest() {
@@ -216,18 +216,18 @@ public class MainControllerTest extends WithApplication {
         });
     }
     @Test
-    public void testUserProfileOK() {
-//        Map<String,String> sessionMap=new HashMap<>();
-//        sessionMap.put("token","test");
-//        sessionMap.put("secret","test");
-//        sessionMap.put("session_id","session_id_test");
-//        Helpers.running(Helpers.fakeApplication(), () -> {
-//            Http.RequestBuilder request = new Http.RequestBuilder()
-//                    .method("GET")
-//                    .session(sessionMap)
-//                    .uri("/userProfile");
-//            Result result = Helpers.route(application, request);
-//            assertEquals(OK, result.status());
-//        });
+    public void testBadRequestUserProfileOK() {
+        Map<String,String> sessionMap=new HashMap<>();
+        sessionMap.put("token","test");
+        sessionMap.put("secret","test");
+        sessionMap.put("session_id","session_id_test");
+        Helpers.running(Helpers.fakeApplication(), () -> {
+            Http.RequestBuilder request = new Http.RequestBuilder()
+                    .method("GET")
+                    .session(sessionMap)
+                    .uri("/userProfile");
+            Result result = Helpers.route(application, request);
+            assertEquals(400, result.status());
+        });
     }
 }
