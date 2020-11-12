@@ -20,7 +20,7 @@ public class TweetWordView {
     AssetsFinder assetsFinder;
 
     /**
-     * Testing if the vies is rendered with estimated text for given input parameters
+     * Testing if the view is rendered with estimated text for given input parameters
      */
     @Test
     public void renderTemplate() {

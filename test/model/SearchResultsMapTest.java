@@ -1,9 +1,6 @@
 package model;
 
-import factory.TweetLyticsFactory;
 import org.junit.Test;
-import play.libs.oauth.OAuth;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +10,14 @@ import java.util.concurrent.CompletableFuture;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * @author Manoj
+ * This class performs testing for {@link SearchResultsMap}.
+ */
 public class SearchResultsMapTest {
+    /**
+     * Test that we correctly implement singleton pattern for {@link SearchResultsMap}.
+     */
     @Test
     public void testSingleton() {
         SearchResultsMap instance1 = SearchResultsMap.getInstance();
@@ -27,11 +31,18 @@ public class SearchResultsMapTest {
         instance1=null;
         instance2=null;
     }
+
+    /**
+     * Test the getSearchResultsMap() method of {@link SearchResultsMap}.
+     */
     @Test
     public void testGetSearchResultsMap(){
         SearchResultsMap instance = SearchResultsMap.getInstance();
         assertEquals(instance.getSearchResultsMap(), new HashMap<String, CompletableFuture<List<SearchResults>>>());
     }
+    /**
+     * Test the setSearchResultsMap() method of {@link SearchResultsMap}.
+     */
     @Test
     public void testSetSearchResultsMap(){
         SearchResultsMap instance = SearchResultsMap.getInstance();
@@ -40,6 +51,10 @@ public class SearchResultsMapTest {
         instance.setSearchResultsMap(searchResultsMap);
         assertEquals(instance.getSearchResultsMap(), searchResultsMap);
     }
+
+    /**
+     * Test the addSearchResultsMap() method of {@link SearchResultsMap}.
+     */
     @Test
     public void testAddSearchResultsMap(){
         SearchResultsMap instance = SearchResultsMap.getInstance();
@@ -49,6 +64,9 @@ public class SearchResultsMapTest {
         instance.addSearchResultsMap("test_session",arrayListCompletableFuture);
         assertEquals(instance.getSearchResultsMap(), searchResultsMap);
     }
+    /**
+     * Test the getListSearchResultsMap() method of {@link SearchResultsMap}.
+     */
     @Test
     public void testGetListSearchResultsCount(){
         SearchResultsMap instance = SearchResultsMap.getInstance();
