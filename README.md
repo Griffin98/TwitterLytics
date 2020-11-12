@@ -49,3 +49,12 @@ There are several demonstration files available in this template.
 - `ExampleFilter.java`:
 
   A simple filter that adds a header to every response.
+## Dataset 
+
+- `positive-words.txt`:
+- `negative-words.txt`:
+
+ These both files placed in assets folder. 
+ You can also find these files on github:  
+ https://github.com/jeffreybreen/twitter-sentiment-analysis-tutorial-201107/tree/master/data/opinion-lexicon-English
+

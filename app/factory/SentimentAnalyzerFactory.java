@@ -25,6 +25,7 @@ public class SentimentAnalyzerFactory {
 
     /**
      * Instantiates a new Sentiment analyzer factory.
+     * Gets the positive and negative words from txt files and store in particular array list.
      */
     public SentimentAnalyzerFactory() {
 
