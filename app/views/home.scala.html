@@ -20,7 +20,6 @@
 
         <section class="w3-container w3-center" >
         @helper.form(routes.MainController.search) {
-            @helper.CSRF.formField
             @helper.inputText(searchForm("searchKey"))
             <button type="submit" class="w3-blue w3-padding-large w3-large w3-round-large w3-margin-top">Search</button>
         }

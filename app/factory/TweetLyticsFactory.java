@@ -58,7 +58,7 @@ public class TweetLyticsFactory {
      */
     public static TweetLyticsFactory getInstance(RequestToken accessToken) {
 
-        if(accessToken == null && !(accessToken instanceof RequestToken))
+        if(accessToken == null)
             throw new NullPointerException("Invalid token specified");
 
         if (INSTANCE == null) {
@@ -107,8 +107,7 @@ public class TweetLyticsFactory {
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (oldValue, newValue) -> oldValue, LinkedHashMap::new)));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new)));
     }
 
     /**
