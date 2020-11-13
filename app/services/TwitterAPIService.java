@@ -9,6 +9,7 @@ import model.User;
 import twitter4j.*;
 
 /**
+ * @author Dhyey Patel
  * Core class which perform API call to Twitter using Twitter4j. This class
  * encapsulates twitter4j responses into {@link Tweet}.
  */

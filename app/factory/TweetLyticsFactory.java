@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * @author Dhyey Patel
  * This factory class provide unified way to perform asynchronous function call to
  * {@link TwitterAPIService} using {@link CompletableFuture}.
  * 
@@ -32,6 +33,10 @@ public class TweetLyticsFactory {
 
     private final CompletableFuture<TwitterAPIService> twitterAPIService;
 
+    /**
+     * constructor for {@link TweetLyticsFactory}
+     * @param accessToken  access token
+     */
     private TweetLyticsFactory(RequestToken accessToken) {
 
         ConfigurationBuilder cb = new ConfigurationBuilder();

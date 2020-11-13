@@ -17,9 +17,9 @@ public class UserFactory {
     private HashMap<Long, User> userHashMap;
 
     /**
-     * this method is used to assign a hashmap list to userHashMap object
+     * constructor for {@link UserFactory}
      */
-    private UserFactory() {
+    public UserFactory() {
         userHashMap = new HashMap<>();
     }
 
@@ -38,12 +38,12 @@ public class UserFactory {
     /**
      * This method is used to map the entire user object to userHasMap using the userId
      * If user is null, a new user is created and then assigned it to userHashMap
-     * @param userId
-     * @param userName
-     * @param userScreenName
-     * @param userProfileImage
-     * @param userProfileLink
-     * @return
+     * @param userId            UserId
+     * @param userName          UserName
+     * @param userScreenName    UserScreenName
+     * @param userProfileImage  UserProfileImage
+     * @param userProfileLink   UserProfileLink
+     * @return  returns user object
      */
     public User getOrCreateUser(long userId, String userName, String userScreenName, String userProfileImage,
                                 String userProfileLink)  {
@@ -59,6 +59,11 @@ public class UserFactory {
         return user;
     }
 
+    /**
+     * method to get user by userId
+     * @param userId    userId
+     * @return returns user object based on userId
+     */
     public User getUserById(long userId) {
         User user = userHashMap.get(userId);
         return  user;

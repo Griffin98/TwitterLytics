@@ -1,5 +1,6 @@
-package model;/*
-  @author Darshan on 03-11-2020
+package model;
+/**
+ * @author Darshan on 03-11-2020
  * @project TweetLytics
  */
 import org.junit.Before;
@@ -113,6 +114,10 @@ public class TweetTest {
     public void testHashCode(){
         assertEquals(tweet.hashCode(),Objects.hash(tweet.getUser(), tweet.getText(), tweet.getCreationTime()));
     }
+
+    /**
+     * Test Equals Tweet
+     */
     @Test
     public void testEqualsTweet(){
         Tweet tweet1=tweet;

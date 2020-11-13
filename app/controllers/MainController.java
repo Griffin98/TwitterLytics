@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 /**
+ * @author Manoj
  * This controller contains an action to handle HTTP requests
  * to the application's home page.
  */
@@ -55,8 +56,8 @@ public class MainController extends Controller {
     }
     /**
      *
-     * @param request
-     * @return
+     * @param request a http request
+     * @return search results
      */
     public CompletableFuture<Result> main(Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
@@ -68,6 +69,12 @@ public class MainController extends Controller {
                 ok(views.html.home.render(form, asScala(results), assetsFinder,request, messagesApi.preferred(request))
                 ));
     }
+
+    /**
+     * method for search
+     * @param request http request
+     * @return
+     */
     public CompletionStage<Result> search(Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         Optional<String> sessionId = request.session().get("session_id");
@@ -90,6 +97,13 @@ public class MainController extends Controller {
         }));
         return CompletableFuture.completedFuture(redirect(routes.MainController.main()));
     }
+
+    /**
+     * method for TweetWords
+     * @param index  index
+     * @param request   http request
+     * @return
+     */
     public CompletionStage<Result> tweetWords(Integer index,Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         Optional<String> sessionId = request.session().get("session_id");
@@ -104,6 +118,12 @@ public class MainController extends Controller {
         return futureStatistics.thenApplyAsync(statistics->ok(views.html.tweetWords.render(statistics,assetsFinder)));
     }
 
+    /**
+     * Search hashTag method
+     * @param tag      tag
+     * @param request  http request
+     * @return
+     */
     public CompletionStage<Result> searchHashTags(String tag, Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         Optional<String> sessionId = request.session().get("session_id");
@@ -116,6 +136,14 @@ public class MainController extends Controller {
                 ok(views.html.hashTags.render(asScala(result), assetsFinder,request, messagesApi.preferred(request))
                 ));
     }
+
+    /**
+     * UserProfile Method
+     *
+     * @param userID    userId
+     * @param request   http request
+     * @return
+     */
     public CompletionStage<Result> userProfile(Long userID, Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         if(!sessionTokenPair.isPresent()){
@@ -127,8 +155,8 @@ public class MainController extends Controller {
         return futureUserHomeLine.thenApplyAsync(userHomeLine ->ok(views.html.userProfile.render(user, asScala(userHomeLine),assetsFinder)));
     }
     /**
-     *
-     * @param request
+     * method for authentication
+     * @param request  http request
      * @return
      */
     public Result auth(Http.Request request) {
@@ -160,8 +188,8 @@ public class MainController extends Controller {
         return result;
     }
     /**
-     *
-     * @param request
+     * optional getSessionTokenPair method
+     * @param request   http request
      * @return
      */
     public Optional<RequestToken> getSessionTokenPair(Http.Request request) {

@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * @author Dhyey Patel
  * This class performs testing for {@link TweetLyticsFactory}.
  */
 public class TweetLyticsFactoryTest {

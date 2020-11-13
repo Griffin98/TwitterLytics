@@ -1,5 +1,6 @@
-package model;/*
-  @author Darshan on 03-11-2020
+package model;
+/**
+ * @author Darshan on 03-11-2020
  * @project TweetLytics
  */
 
