@@ -2,6 +2,7 @@ package controller;
 import static org.junit.Assert.assertEquals;
 import static play.mvc.Http.Status.OK;
 import com.google.common.collect.ImmutableMap;
+import factory.UserFactory;
 import model.SearchResults;
 import model.SearchResultsMap;
 import model.Tweet;
@@ -232,19 +233,25 @@ public class MainControllerTest extends WithApplication {
         SearchResultsMap instance = SearchResultsMap.getInstance();
         instance=null;
     }
+    /**
+     * To test searchHashTags() method in {@link controllers.MainController} where Bad request is thrown due to invalid session
+     */
     @Test
-    public void testSearchHashTagsFail() {
+    public void testSearchHashTagsBadRequest() {
         Helpers.running(Helpers.fakeApplication(), () -> {
             Http.RequestBuilder request = new Http.RequestBuilder()
                     .method("GET")
-                    .uri("/searchHashTags");
+                    .uri("/searchHashTags?tag=test");
             Result result = Helpers.route(application, request);
             assertEquals(400, result.status());
 
         });
     }
+    /**
+     * To test searchHashTags() method in {@link controllers.MainController} is OK
+     */
     @Test
-    public void testBadSearchHashTagsPass() {
+    public void testBadSearchHashTagsOK() {
         Map<String,String> sessionMap=new HashMap<>();
         sessionMap.put("token","test");
         sessionMap.put("secret","test");
@@ -253,26 +260,33 @@ public class MainControllerTest extends WithApplication {
             Http.RequestBuilder request = new Http.RequestBuilder()
                     .method("GET")
                     .session(sessionMap)
-                    .uri("/searchHashTags");
+                    .uri("/searchHashTags?tag=test");
 
             Result result = Helpers.route(application, request);
-            assertEquals(400, result.status());
-
+            assertEquals(OK, result.status());
         });
     }
+    /**
+     * To test userProfile() method in {@link controllers.MainController} where Bad request is thrown due to invalid session
+     */
     @Test
     public void testUserProfileBadRequest() {
         Helpers.running(Helpers.fakeApplication(), () -> {
             Http.RequestBuilder request = new Http.RequestBuilder()
                     .method("GET")
-                    .uri("/userProfile");
+                    .uri("/userProfile?userId=1");
             Result result = Helpers.route(application, request);
             assertEquals(400, result.status());
 
         });
     }
+    /**
+     * To test userProfile() method in {@link controllers.MainController} is OK
+     */
     @Test
     public void testBadRequestUserProfileOK() {
+        UserFactory userFactory=UserFactory.getInstance();
+        userFactory.getOrCreateUser(1,"test","test","test","test");
         Map<String,String> sessionMap=new HashMap<>();
         sessionMap.put("token","test");
         sessionMap.put("secret","test");
@@ -281,9 +295,9 @@ public class MainControllerTest extends WithApplication {
             Http.RequestBuilder request = new Http.RequestBuilder()
                     .method("GET")
                     .session(sessionMap)
-                    .uri("/userProfile");
+                    .uri("/userProfile?userId=1118808460987117573");
             Result result = Helpers.route(application, request);
-            assertEquals(400, result.status());
+            assertEquals(OK, result.status());
         });
     }
 }

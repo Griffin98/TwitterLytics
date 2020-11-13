@@ -9,7 +9,6 @@ GET     /assets/*file               controllers.Assets.versioned(file)
 
 # Routes for Twitter OAUTH
 GET     /twitter/auth               controllers.MainController.auth(request : Request)
-#GET     /twitter/homeTimeline       controllers.MainController.homeTimeline(request: Request)
 GET     /home                       controllers.MainController.main(request : Request)
 GET     /search                     controllers.MainController.search(request :  Request)
 GET     /tweetWords                 controllers.MainController.tweetWords(index: Integer,request : Request)
