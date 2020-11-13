@@ -87,6 +87,23 @@ public class MainControllerTest extends WithApplication {
         instance=null;
     }
     /**
+     * To test main() method in {@link controllers.MainController} where Bad request is throws due to invalid session
+     */
+    @Test
+    public void mainWithSessionFail() {
+        Helpers.running(Helpers.fakeApplication(), () -> {
+            Map<String,String> sessionMap=new HashMap<>();
+            sessionMap.put("token","test");
+            sessionMap.put("secret","test");
+            Http.RequestBuilder request = new Http.RequestBuilder()
+                    .method("GET")
+                    .session(sessionMap)
+                    .uri("/home");
+            Result result = Helpers.route(application, request);
+            assertEquals(400, result.status());
+        });
+    }
+    /**
      * To test tweetWords() method in {@link controllers.MainController} where Bad request is throws due to invalid session
      */
     @Test
@@ -94,6 +111,39 @@ public class MainControllerTest extends WithApplication {
         Helpers.running(Helpers.fakeApplication(), () -> {
             Http.RequestBuilder request = new Http.RequestBuilder()
                     .method("GET")
+                    .uri("/tweetWords?index=0");
+            Result result = Helpers.route(application, request);
+            assertEquals(400, result.status());
+        });
+    }
+    /**
+     * To test tweetWords() method in {@link controllers.MainController} where Bad request is throws due to invalid session
+     */
+    @Test
+    public void TweetWordsWithTokenPairFail() {
+        Helpers.running(Helpers.fakeApplication(), () -> {
+            Map<String,String> sessionMap=new HashMap<>();
+            sessionMap.put("session_id","test");
+            Http.RequestBuilder request = new Http.RequestBuilder()
+                    .method("GET")
+                    .session(sessionMap)
+                    .uri("/tweetWords?index=0");
+            Result result = Helpers.route(application, request);
+            assertEquals(400, result.status());
+        });
+    }
+    /**
+     * To test tweetWords() method in {@link controllers.MainController} where Bad request is throws due to invalid session
+     */
+    @Test
+    public void TweetWordsWithSessionFail() {
+        Helpers.running(Helpers.fakeApplication(), () -> {
+            Map<String,String> sessionMap=new HashMap<>();
+            sessionMap.put("token","test");
+            sessionMap.put("secret","test");
+            Http.RequestBuilder request = new Http.RequestBuilder()
+                    .method("GET")
+                    .session(sessionMap)
                     .uri("/tweetWords?index=0");
             Result result = Helpers.route(application, request);
             assertEquals(400, result.status());
@@ -113,6 +163,24 @@ public class MainControllerTest extends WithApplication {
                     .method("GET")
                     .session(sessionMap)
                     .uri("/tweetWords?index=1");
+            Result result = Helpers.route(application, request);
+            assertEquals(400, result.status());
+        });
+    }
+    /**
+     * To test tweetWords() method in {@link controllers.MainController} where Bad request is throws due to index out of bound
+     */
+    @Test
+    public void TweetWordsIndexOutOfBoundNegative() {
+        Helpers.running(Helpers.fakeApplication(), () -> {
+            Map<String,String> sessionMap=new HashMap<>();
+            sessionMap.put("token","test");
+            sessionMap.put("secret","test");
+            sessionMap.put("session_id","test");
+            Http.RequestBuilder request = new Http.RequestBuilder()
+                    .method("GET")
+                    .session(sessionMap)
+                    .uri("/tweetWords?index=-1");
             Result result = Helpers.route(application, request);
             assertEquals(400, result.status());
         });
@@ -163,6 +231,23 @@ public class MainControllerTest extends WithApplication {
         Helpers.running(Helpers.fakeApplication(), () -> {
             Http.RequestBuilder request = new Http.RequestBuilder()
                     .method("GET")
+                    .uri("/search");
+            Result result = Helpers.route(application, request);
+            assertEquals(400, result.status());
+        });
+    }
+    /**
+     * To test search() method in {@link controllers.MainController} where Bad request is throws due to invalid session
+     */
+    @Test
+    public void searchWithSessionFail() {
+        Helpers.running(Helpers.fakeApplication(), () -> {
+            Map<String,String> sessionMap=new HashMap<>();
+            sessionMap.put("token","test");
+            sessionMap.put("secret","test");
+            Http.RequestBuilder request = new Http.RequestBuilder()
+                    .method("GET")
+                    .session(sessionMap)
                     .uri("/search");
             Result result = Helpers.route(application, request);
             assertEquals(400, result.status());
@@ -245,6 +330,24 @@ public class MainControllerTest extends WithApplication {
             Result result = Helpers.route(application, request);
             assertEquals(400, result.status());
 
+        });
+    }
+    /**
+     * To test searchHashTags() method in {@link controllers.MainController} where Bad request is thrown due to invalid session
+     */
+    @Test
+    public void hashTagsWithTokenPairFail() {
+        Helpers.running(Helpers.fakeApplication(), () -> {
+            Map<String,String> sessionMap=new HashMap<>();
+            sessionMap.put("token","test");
+            sessionMap.put("secret","test");
+            sessionMap.put("session_id",null);
+            Http.RequestBuilder request = new Http.RequestBuilder()
+                    .method("GET")
+                    .session(sessionMap)
+                    .uri("/searchHashTags?tag=test");
+            Result result = Helpers.route(application, request);
+            assertEquals(400, result.status());
         });
     }
     /**
