@@ -111,4 +111,14 @@ public class SearchResultsTest {
     public void testHashCode(){
         assertEquals(searchResults.hashCode(),Objects.hash(searchResults.getKeyword(), tweetList));
     }
+    @Test
+    public void testEquals(){
+        SearchResults searchResults3=searchResults;
+        assertEquals(searchResults3.equals(searchResults),true);
+        assertEquals(searchResults3.equals(new User(1L,"test","test","test","test")),false);
+        SearchResults searchResults4 = new SearchResults("today", tweetList, ":-)");
+        assertEquals(searchResults4.equals(searchResults),true);
+        SearchResults searchResults5 = new SearchResults("today1", tweetList, ":-)");
+        assertEquals(searchResults5.equals(searchResults),false);
+    }
 }

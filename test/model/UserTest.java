@@ -3,9 +3,12 @@ package model;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.validation.constraints.AssertTrue;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static play.test.Helpers.*;
 //import static org.fest.assertions.Assertions.*;
 
@@ -74,12 +77,19 @@ public class UserTest {
     }
     @Test
     public void testEquals(){
-
+        User user=new User(123,"hello","xyz","img","link");
+        User user2=user;
+        assertTrue(user.equals(user2));
+        Tweet tweet=new Tweet(user,"text",new Date(),new ArrayList<>());
+        assertFalse(user.equals(tweet));
+        User user1=new User(123,"hello","xyz","img","link");
+        User user3=new User(123,"hello","xyz","img","link");
+        assertEquals(user1.equals(user3),false);
+        User user4=new User(123,"hello_test","xyz","img","link");
+        assertFalse(user.equals(user4));
     }
-//    @Test
-//    public int testHashCode(){
-//        return Objects.hash(user.getUserId(),user.getUserName(),user.getUserProfileImage(),user.getUserProfileLink());
-//    }
-
-
+    @Test
+    public void testHashCode(){
+        assertEquals(Objects.hash(user.getUserId(),user.getUserName(),user.getUserProfileImage(),user.getUserProfileLink()),user.hashCode());
+    }
 }

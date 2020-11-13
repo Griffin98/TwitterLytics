@@ -113,6 +113,26 @@ public class TweetTest {
     public void testHashCode(){
         assertEquals(tweet.hashCode(),Objects.hash(tweet.getUser(), tweet.getText(), tweet.getCreationTime()));
     }
-
+    @Test
+    public void testEqualsTweet(){
+        Tweet tweet1=tweet;
+        assertEquals(tweet1.equals(tweet),true);
+        assertEquals(tweet1.equals(new User(123,"hello","xyz","img","link")),false);
+        date = new Date();
+        hashTags = new ArrayList<>();
+        textTweet = "This is my first tweet";
+        User user1=new User(1, "User", "screenName", "userprofile", "useProfile");
+        Tweet tweet4 = new Tweet(user1, textTweet, date, hashTags);
+//        date = new Date();
+//        hashTags = new ArrayList<>();
+//        textTweet = "This is my first tweet";
+        Tweet tweet2 = new Tweet(user1, textTweet, date, hashTags);
+        assertEquals(tweet4.equals(tweet2),true);
+        date = new Date();
+        hashTags = new ArrayList<>();
+        textTweet = "This is a tweet";
+        Tweet tweet3 = new Tweet(new User(2, "User3", "screenName", "userprofile", "useProfile"), textTweet, date, hashTags);
+        assertEquals(tweet3.equals(tweet2),false);
+    }
 }
 
