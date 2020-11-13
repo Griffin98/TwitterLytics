@@ -19,7 +19,7 @@ public class UserFactory {
     /**
      * constructor for {@link UserFactory}
      */
-    public UserFactory() {
+    private UserFactory() {
         userHashMap = new HashMap<>();
     }
 
