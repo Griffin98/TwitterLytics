@@ -62,7 +62,7 @@ public class MainController extends Controller {
     public CompletableFuture<Result> main(Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         Optional<String> sessionId = request.session().get("session_id");
-        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()){
+        if(!sessionTokenPair.isPresent() || !sessionId.isPresent()){
             return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
         }
         return searchResultsMap.getSearchResultsMap().get(sessionId.get()).thenApplyAsync(results ->
@@ -78,7 +78,7 @@ public class MainController extends Controller {
     public CompletionStage<Result> search(Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         Optional<String> sessionId = request.session().get("session_id");
-        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()){
+        if(!sessionTokenPair.isPresent() || !sessionId.isPresent()){
             return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
         }
         if(searchResultsMap.getListSearchResultsCount(sessionId.get())>=10) {
@@ -107,7 +107,7 @@ public class MainController extends Controller {
     public CompletionStage<Result> tweetWords(Integer index,Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         Optional<String> sessionId = request.session().get("session_id");
-        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()) {
+        if(!sessionTokenPair.isPresent() || !sessionId.isPresent()) {
             return CompletableFuture.supplyAsync(() -> badRequest(views.html.errorView.render("Invalid session", assetsFinder)));
         }
         if(index>=searchResultsMap.getListSearchResultsCount(sessionId.get()) || index<0){
@@ -127,7 +127,7 @@ public class MainController extends Controller {
     public CompletionStage<Result> searchHashTags(String tag, Http.Request request) {
         Optional<RequestToken> sessionTokenPair = getSessionTokenPair(request);
         Optional<String> sessionId = request.session().get("session_id");
-        if(!sessionTokenPair.isPresent() && !sessionId.isPresent()){
+        if(!sessionTokenPair.isPresent() || !sessionId.isPresent()){
             return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
         }
         tweetLyticsFactory = TweetLyticsFactory.getInstance(sessionTokenPair.get());
