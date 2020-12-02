@@ -1,0 +1,26 @@
+@(request: play.mvc.Http.Request)
+
+
+<html>
+
+    <head>
+        <script type='text/javascript' src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
+        <script type='text/javascript' src='@routes.Assets.versioned("javascripts/index.js")'></script>
+    </head>
+
+    <body data-ws-url="@routes.MainController.ws.webSocketURL(request)">
+        <section id="top">
+            <div class="wrapper">
+                <img class="resize" src="assets/images/play_icon_reverse.svg" alt="logo" />
+                <h1>Play Hello World Web Tutorial</h1>
+            </div>
+
+        </section>
+
+        <div id="test">
+        </div>
+
+        <div id="tweets">
+        </div>
+    </body>
+</html>

@@ -47,9 +47,9 @@
                                 @for((tag, index) <- tweet.getHashTags.zipWithIndex) {
 
                                     @if( index == ( tweet.getHashTags.size() - 1 )) {
-                                        <a href="@routes.MainController.searchHashTags(tag)">@tag</a>
+                                        <a href="@routes.MainController.searchHashTags(tag)">#@tag</a>
                                     } else {
-                                        <a href="@routes.MainController.searchHashTags(tag)">@tag</a> ,
+                                        <a href="@routes.MainController.searchHashTags(tag)">#@tag</a> ,
                                     }
                                 }
                             </p>

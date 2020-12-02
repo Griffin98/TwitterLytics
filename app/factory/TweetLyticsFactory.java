@@ -29,7 +29,7 @@ public class TweetLyticsFactory {
     public static final String API_KEY_SECRET = "2JR5ZlrSFwZX2PHXdccnAoAuLES6KKQvAJOWYWO54Bma7AcImh";
 
     // Numbers of tweets to fetch. Max is 100.
-    private static final int MAX_SEARCH_LIMIT = 100;
+    private static final int MAX_SEARCH_LIMIT = 10;
 
     private final CompletableFuture<TwitterAPIService> twitterAPIService;
 

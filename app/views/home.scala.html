@@ -4,103 +4,163 @@
     @(searchForm : Form[SearchData], tweetSearchResults: Seq[SearchResults])(implicit assetsFinder: AssetsFinder, request: Request, messages: play.i18n.Messages)
     @import helper._
 
-    @main("Hello") {
-
-        <header class="w3-container w3-center" style="padding:16px 16px">
-            <h1 class="w3-margin w3-xxlarg">Welcome to, <span class="w3-myfont w3-jumbo">TweetLytics</span></h1>
-            @* Global errors are not tied to any particular form field *@
-            @if(searchForm.hasGlobalErrors) {
-                @searchForm.globalErrors.asScala.map { error: play.data.validation.ValidationError =>
-                    <div>
-                        @error.key: @error.message
-                    </div>
-                }
+    <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                @* Here's where we render the page title `String`. *@
+            <title>TweetLytics</title>
+            <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+            <script src="https://kit.fontawesome.com/7593d6dce3.js" crossorigin="anonymous"></script>
+            <script type='text/javascript' src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
+            <script type='text/javascript' src='@routes.Assets.versioned("javascripts/index.js")'></script>
+            <style>
+			body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+            .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+            .fa-anchor,.fa-coffee {font-size:200px}
+            body{
+                background: #e6ecf0;
             }
-        </header>
+            .button {
+                padding: 15px 25px;
+                font-size: 24px;
+                text-align: center;
+                cursor: pointer;
+                outline: none;
+                color: #fff;
+                background-color: #4CAF50;
+                border: none;
+                border-radius: 15px;
+                box-shadow: 0 9px #999;
+            }
 
-        <section class="w3-container w3-center" >
-        @helper.form(routes.MainController.search) {
-            @helper.inputText(searchForm("searchKey"))
-            <button type="submit" class="w3-blue w3-padding-large w3-large w3-round-large w3-margin-top">Search</button>
-        }
-        </section>
+            .button:hover {background-color: #3e8e41}
 
-         <section class="w3-container w3-center">
-             @for((tsr,gi) <- tweetSearchResults.zipWithIndex) {
+            .button:active {
+                background-color: #3e8e41;
+                box-shadow: 0 5px #666;
+                transform: translateY(4px);
+            }
 
-                 <h3>Search Keyword: <a href="@routes.MainController.tweetWords(gi)">@tsr.getKeyword</a>, Sentiment:
-                     @if(tsr.getOverallResult.equals(":-)")){
-                     Happy
-                     <i class="fas fa-smile-beam" style="font-size: 30px;
-                         color: green;"></i>
-                 }
-                     @if(tsr.getOverallResult.equals(":-(")){
-                         Sad
-                         <i class="fas fa-frown" style="font-size: 30px;
-                             color: red;"></i>
-                     }
-                     @if(tsr.getOverallResult.equals(":-|")){
-                         Neutral
-                         <i class="fas fa-meh" style="font-size: 30px;
-                             color: orange;"></i>
-                     }
+            .w3-myfont {
+                font-family: "Comic Sans MS", cursive, sans-serif;
+            }
+
+            hr {implicit assetsFinder: AssetsFinder
+                display: block;
+                height: 1px;
+                padding-left: 50px;
+                padding-right: 50px;
+                border-top: 2px solid #cc0000;
+                margin: auto;
+                width: 70%;
+            }
+              </style>
+            </head>
+            <body data-ws-url="@routes.MainController.ws.webSocketURL(request)">
+
+                <header class="w3-container w3-center" style="padding:16px 16px">
+                    <h1 class="w3-margin w3-xxlarg">Welcome to, <span class="w3-myfont w3-jumbo">TweetLytics</span></h1>
+                    @* Global errors are not tied to any particular form field *@
+                    @if(searchForm.hasGlobalErrors) {
+                        @searchForm.globalErrors.asScala.map { error: play.data.validation.ValidationError =>
+                            <div>
+                                @error.key: @error.message
+                            </div>
+                        }
+                    }
+                </header>
+
+                <section class="w3-container w3-center" >
+                @helper.form(routes.MainController.search) {
+                    @helper.inputText(searchForm("searchKey"))
+                    <button type="submit" class="w3-blue w3-padding-large w3-large w3-round-large w3-margin-top">Search</button>
+                }
+
+                </section>
+
+                <section class="w3-container w3-center">
+
+                <div id="tweets">
+
+                @for((tsr,gi) <- tweetSearchResults.zipWithIndex) {
+
+                    <h3>Search Keyword: <a href="@routes.MainController.tweetWords(gi)">@tsr.getKeyword</a>, Sentiment:
+                        @if(tsr.getOverallResult.equals(":-)")){
+                            Happy
+                        <i class="fas fa-smile-beam" style="font-size: 30px;
+                            color: green;"></i>
+                    }
+                        @if(tsr.getOverallResult.equals(":-(")){
+                            Sad
+                            <i class="fas fa-frown" style="font-size: 30px;
+                                color: red;"></i>
+                        }
+                        @if(tsr.getOverallResult.equals(":-|")){
+                            Neutral
+                            <i class="fas fa-meh" style="font-size: 30px;
+                                color: orange;"></i>
+                        }
                  </h3>
-                 <hr/>
-                 @for((tweet, index) <- tsr.getTweets.zipWithIndex) {
+                    <hr/>
+                    @for((tweet, index) <- tsr.getTweets.zipWithIndex) {
 
-                     @if(index < 10) {
-                         <div class="w3-card-4 w3-center w3-round-large" style="width:50%;  margin: 10px; display:inline-block; background: white;">
+                        @if(index < 10) {
+                            <div class="w3-card-4 w3-center w3-round-large" style="width:50%;  margin: 10px; display:inline-block; background: white;">
 
-                             <div class="w3-row">
+                                <div class="w3-row">
 
-                                 <div class="w3-center w3-col" style="width: 20%">
-                                     <p class="w3-text-gray">User</p>
-                                     <img src="@tweet.getUser.getUserProfileImage" alt="Avatar" class="w3-circle"><br/>
-                                     <p><a href="@routes.MainController.userProfile(tweet.getUser().getUserId())">@tweet.getUser.getUserScreenName</a></p>
-                                 </div>
+                                    <div class="w3-center w3-col" style="width: 20%">
+                                        <p class="w3-text-gray">User</p>
+                                        <img src="@tweet.getUser.getUserProfileImage" alt="Avatar" class="w3-circle"><br/>
+                                        <p><a href="@routes.MainController.userProfile(tweet.getUser().getUserId())">@tweet.getUser.getUserScreenName</a></p>
+                                    </div>
 
-                                 <div class="w3-center w3-col" style="width: 60%">
-                                     <p class="w3-text-gray">Tweet</p>
-                                     <p class="w3-left">Text: @tweet.getText</p>
-                                     <p class="w3-left"> HashTags:
-                                         @for((tag, index) <- tweet.getHashTags.zipWithIndex) {
+                                    <div class="w3-center w3-col" style="width: 60%">
+                                        <p class="w3-text-gray">Tweet</p>
+                                        <p class="w3-left">Text: @tweet.getText</p>
+                                        <p class="w3-left"> HashTags:
+                                            @for((tag, index) <- tweet.getHashTags.zipWithIndex) {
 
-                                             @if( index == ( tweet.getHashTags.size() - 1 )) {
-                                                 <a href="@routes.MainController.searchHashTags(tag)">@tag</a>
-                                             } else {
-                                                 <a href="@routes.MainController.searchHashTags(tag)">@tag</a>,
-                                             }
-                                         }
-                                     </p>
-                                 </div>
+                                                @if( index == ( tweet.getHashTags.size() - 1 )) {
+                                                    <a href="@routes.MainController.searchHashTags(tag)">#@tag</a>
+                                                } else {
+                                                    <a href="@routes.MainController.searchHashTags(tag)">#@tag</a>,
+                                                }
+                                            }
+                                        </p>
+                                    </div>
 
-                                 <div class="w3-center  w3-col" style="width: 20%">
-                                     <p class="w3-text-gray">Sentiment</p>
-                                     @{
-                                         if(tweet.getTweetSentiment.get(index).contains(":-)")) {
-                                                 <i class="fas fa-smile-beam" style="font-size: 30px;
+                                    <div class="w3-center  w3-col" style="width: 20%">
+                                        <p class="w3-text-gray">Sentiment</p>
+                                        @{
+                                            if(tweet.getTweetSentiment.get(index).contains(":-)")) {
+                                                    <i class="fas fa-smile-beam" style="font-size: 30px;
                                         color: green;"></i>
-                                         }else if(tweet.getTweetSentiment.get(index).contains(":-(")) {
-                                                 <i class="fas fa-frown" style="font-size: 30px;
+                                            }else if(tweet.getTweetSentiment.get(index).contains(":-(")) {
+                                                    <i class="fas fa-frown" style="font-size: 30px;
                                     color: red;"></i>
-                                         }else {
-                                                 <i class="fas fa-meh" style="font-size: 30px;
+                                            }else {
+                                                    <i class="fas fa-meh" style="font-size: 30px;
                                         color: orange;"></i>
-                                         }
-                                     }
-                                 </div>
+                                            }
+                                        }
+                                    </div>
 
-                             </div>
+                                </div>
 
-                         </div>
-                     }
+                            </div>
+                        }
 
-                 }
+                    }
 
-             }
+                }
 
-        </section>
+                </div>
+
+                </section>
 
 
 
-    }
+            </body>
+        </html>
+

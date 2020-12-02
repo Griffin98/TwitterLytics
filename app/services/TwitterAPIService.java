@@ -56,7 +56,7 @@ public class TwitterAPIService {
                 if(tags != null  && tags.length >0){
 
                     for(HashtagEntity tag : tags) {
-                        hashTags.add("#" + tag.getText());
+                        hashTags.add(tag.getText());
                     }
                 }
 
