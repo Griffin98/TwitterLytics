@@ -58,11 +58,6 @@ public class UserActor  extends AbstractActor {
 
         logger.error("Sending Update");
 
-
-        /*final ObjectNode response = Json.newObject();
-        response.put("time", "hello");
-        ws.tell(response, self());*/
-
         CompletableFuture<List<SearchResults>> searchResult = msg.getTweets();
 
         searchResult.thenApply(tweets -> {

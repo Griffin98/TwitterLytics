@@ -74,6 +74,10 @@ public class MainController extends Controller {
 		this.form = formFactory.form(SearchData.class);
 		this.messagesApi = messagesApi;
 
+		OAuth.RequestToken tempToken = new OAuth.RequestToken("804992947015929857-DhDb94zyLSUkZLkXBprs48w9diAMPy9",
+				"t9LOxQbuAuAN0R4rw2Xq7KKZpXw54cECifvxDzAXBD0EM");
+		twitterActor = actorSystem.actorOf(TwitterActor.getProps(tempToken), "twitterActor");
+
 	}
 
 	/**
@@ -216,9 +220,7 @@ public class MainController extends Controller {
 									OAuth.RequestToken accessToken = TWITTER.retrieveAccessToken(requestToken, s);
 									SESSION_ID++;
 									String id = "Session:"+SESSION_ID;
-									OAuth.RequestToken tempToken = new OAuth.RequestToken("804992947015929857-DhDb94zyLSUkZLkXBprs48w9diAMPy9",
-											"t9LOxQbuAuAN0R4rw2Xq7KKZpXw54cECifvxDzAXBD0EM");
-									twitterActor = actorSystem.actorOf(TwitterActor.getProps(tempToken), "twitterActor");
+									twitterActor.tell(new Message.Session(id), ActorRef.noSender());
 									searchResultsMap.addSearchResultsMap(id, CompletableFuture.supplyAsync(() -> new ArrayList<SearchResults>()));
 									return redirect(routes.MainController.main())
 											.addingToSession(request, "session_id", id)

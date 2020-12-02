@@ -24,22 +24,28 @@ import java.util.stream.Stream;
 
 public class TwitterActor extends AbstractActorWithTimers {
 
-    private final Set<ActorRef> userActors;
-    private final HashSet<String> keywords;
+    //private final Set<ActorRef> userActors;
+    //private final HashSet<String> keywords;
     private final HashMap<String, List<Tweet>> history;
-    private List<SearchResults> indexedResult;
+
+    private String currentSession = null;
+    private ArrayList<String> listOfSession;
+    private HashMap<String, HashSet<String>> sessionMapKeyword;
+    private HashMap<String, Set<ActorRef>> sessionMapActorRef;
 
     private final TweetLyticsFactory tweetLyticsFactory;
 
     play.Logger.ALogger logger = play.Logger.of(getClass());
 
     public TwitterActor(RequestToken token) {
-        this.userActors = new HashSet<>();
+        //this.userActors = new HashSet<>();
         this.tweetLyticsFactory = TweetLyticsFactory.getInstance(token);
 
-        this.keywords = new HashSet<>();
+        //this.keywords = new HashSet<>();
         this.history = new HashMap<>();
-        this.indexedResult = new ArrayList<>();
+        this.listOfSession = new ArrayList<>();
+        this.sessionMapActorRef = new HashMap<>();
+        this.sessionMapKeyword = new HashMap<>();
     }
 
 
@@ -65,13 +71,20 @@ public class TwitterActor extends AbstractActorWithTimers {
         return receiveBuilder()
                 .match(Message.Register.class, msg -> {
                     logger.error("Received new user");
-                    userActors.add(sender());
+
+                    Set<ActorRef> actorRefSet = sessionMapActorRef.get(currentSession);
+                    actorRefSet.add(sender());
+                    sessionMapActorRef.put(currentSession, actorRefSet);
+                    //userActors.add(sender());
                 })
                 .match(Message.Keyword.class, msg -> {
                     logger.error("Received message");
                     logger.error(msg.getKeyword());
 
-                    keywords.add(msg.getKeyword());
+                    HashSet<String> key = sessionMapKeyword.get(currentSession);
+                    key.add(msg.getKeyword());
+                    sessionMapKeyword.put(currentSession, key);
+                    //keywords.add(msg.getKeyword());
 
                     CompletableFuture<List<SearchResults>>  results = tweetLyticsFactory.getTweetsByKeyword(msg.getKeyword())
                             .thenApply(res -> {
@@ -84,6 +97,13 @@ public class TwitterActor extends AbstractActorWithTimers {
 
                     sender().tell(results, self());
                 })
+                .match(Message.Session.class ,msg -> {
+                    logger.error("Session started : ", msg.getSessionId());
+                    currentSession = msg.getSessionId();
+                    listOfSession.add(currentSession);
+                    sessionMapKeyword.put(currentSession, new HashSet<>());
+                    sessionMapActorRef.put(currentSession, new HashSet<>());
+                })
                 .match(Message.Tick.class, tick -> {
                     notifyUsers();
                 })
@@ -92,43 +112,51 @@ public class TwitterActor extends AbstractActorWithTimers {
 
     private void notifyUsers() {
 
-        CompletableFuture<List<SearchResults>> result = CompletableFuture.supplyAsync(() -> {
-            List<SearchResults> results = new ArrayList<>();
 
-            for(String key : keywords) {
+        for(String session: listOfSession) {
 
-                tweetLyticsFactory.getTweetsByKeyword(key)
-                        .thenAccept(res -> {
-                            List<Tweet> now = res.get(0).getTweets();
-                            List<Tweet> before = history.get(key);
+            HashSet<String> keywords = sessionMapKeyword.get(session);
+            Set<ActorRef> userActors = sessionMapActorRef.get(session);
 
-                            List<Tweet> diff = getUpdate(now, before);
-                            history.put(key, diff);
+            CompletableFuture<List<SearchResults>> result = CompletableFuture.supplyAsync(() -> {
+                List<SearchResults> results = new ArrayList<>();
 
-                            SentimentAnalyzerFactory sentimentAnalyzerFactory = new SentimentAnalyzerFactory();
-                            List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(diff);
-                            String overallResult = sentimentAnalyzerFactory.getResultOfAllTweet(resultsIndividualTweets);
-                            diff.forEach(u -> u.setTweetSentiment(resultsIndividualTweets));
+                for(String key : keywords) {
 
-                            SearchResults searchResults = new SearchResults(key, diff, overallResult);
-                            results.add(searchResults);
-                            
-                        });
+                    tweetLyticsFactory.getTweetsByKeyword(key)
+                            .thenAccept(res -> {
+                                List<Tweet> now = res.get(0).getTweets();
+                                List<Tweet> before = history.get(key);
+
+                                List<Tweet> diff = getUpdate(now, before);
+                                history.put(key, diff);
+
+                                SentimentAnalyzerFactory sentimentAnalyzerFactory = new SentimentAnalyzerFactory();
+                                List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(diff);
+                                String overallResult = sentimentAnalyzerFactory.getResultOfAllTweet(resultsIndividualTweets);
+                                diff.forEach(u -> u.setTweetSentiment(resultsIndividualTweets));
+
+                                SearchResults searchResults = new SearchResults(key, diff, overallResult);
+                                results.add(searchResults);
+
+                            });
+                }
+                Collections.reverse(results);
+
+                return results;
+            });
+
+            for(ActorRef user: userActors) {
+                try {
+                    user.tell(new Message.Update(result), self());
+                }catch (Exception e) {
+                    return;
+                }
             }
-            Collections.reverse(results);
 
-            indexedResult = results;
-
-            return results;
-        });
-
-        for(ActorRef user: userActors) {
-            try {
-                user.tell(new Message.Update(result), self());
-            }catch (Exception e) {
-                return;
-            }
         }
+
+
 
     }
 
