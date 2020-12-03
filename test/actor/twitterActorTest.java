@@ -35,7 +35,7 @@ public class twitterActorTest {
         testProbe.expectNoMsg();
         twitterActor.tell(new Message.Register(), testProbe.getRef());
         testProbe.expectNoMsg();
-        twitterActor.tell(new Message.Keyword("hello"), testProbe.getRef());
+        twitterActor.tell(new Message.Keyword("hello","testSessionId"), testProbe.getRef());
         testProbe.expectMsgClass(CompletableFuture.class);
         twitterActor.tell(new Message.Tick(), testProbe.getRef());
         testProbe.expectMsgClass(Message.Update.class);

@@ -19,6 +19,7 @@ import javax.inject.Named;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,7 +31,8 @@ public class TwitterActor extends AbstractActorWithTimers {
 
     private String currentSession = null;
     private ArrayList<String> listOfSession;
-    private HashMap<String, HashSet<String>> sessionMapKeyword;
+    private HashMap<String, ArrayList<String>> sessionMapKeyword;
+    private HashMap<String, List<SearchResults>> sessionMapSearchResults;
     private HashMap<String, Set<ActorRef>> sessionMapActorRef;
 
     private final TweetLyticsFactory tweetLyticsFactory;
@@ -46,6 +48,7 @@ public class TwitterActor extends AbstractActorWithTimers {
         this.listOfSession = new ArrayList<>();
         this.sessionMapActorRef = new HashMap<>();
         this.sessionMapKeyword = new HashMap<>();
+        this.sessionMapSearchResults=new HashMap<>();
     }
 
 
@@ -77,21 +80,37 @@ public class TwitterActor extends AbstractActorWithTimers {
                     sessionMapActorRef.put(currentSession, actorRefSet);
                     //userActors.add(sender());
                 })
+                .match(Message.FindStatistics.class, msg -> {
+                    logger.error("Finding statistics for index:",msg.getIndex());
+                    List<SearchResults> searchResults1 = sessionMapSearchResults.get(msg.getSessionId());
+                    CompletableFuture<List<SearchResults>> searchResultsListComp = CompletableFuture.supplyAsync(() -> searchResults1);
+                    CompletableFuture<List<Tweet>> listCompletableFutureTweets = searchResultsListComp.thenApply(searchResults -> searchResults.get(msg.getIndex()).getTweets());
+                    CompletableFuture<LinkedHashMap<String, Long>> mapCompletableFuture = (CompletableFuture<LinkedHashMap<String, Long>>) listCompletableFutureTweets.thenApply(tweets -> tweets.stream()
+                            .map(Tweet::getText)
+                            .flatMap(text -> Arrays.stream(text.split(" ")))
+                            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                            .entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new)));
+                    sender().tell(mapCompletableFuture,self());
+                })
                 .match(Message.Keyword.class, msg -> {
                     logger.error("Received message");
                     logger.error(msg.getKeyword());
 
-                    HashSet<String> key = sessionMapKeyword.get(currentSession);
+                    ArrayList<String> key = sessionMapKeyword.get(currentSession);
+//                    ArrayList<String> key = sessionMapKeyword.get(msg.getSessionId());
                     key.add(msg.getKeyword());
                     sessionMapKeyword.put(currentSession, key);
+//                    sessionMapKeyword.put(msg.getSessionId(), key);
                     //keywords.add(msg.getKeyword());
 
                     CompletableFuture<List<SearchResults>>  results = tweetLyticsFactory.getTweetsByKeyword(msg.getKeyword())
                             .thenApply(res -> {
-
                                 List<Tweet> t = res.get(0).getTweets();
                                 history.put(msg.getKeyword(), t);
-
+                                sessionMapSearchResults.put(currentSession,res);
+//                                sessionMapSearchResults.put(msg.getSessionId(),res);
                                 return res;
                             });
 
@@ -101,7 +120,7 @@ public class TwitterActor extends AbstractActorWithTimers {
                     logger.error("Session started : ", msg.getSessionId());
                     currentSession = msg.getSessionId();
                     listOfSession.add(currentSession);
-                    sessionMapKeyword.put(currentSession, new HashSet<>());
+                    sessionMapKeyword.put(currentSession, new ArrayList<>());
                     sessionMapActorRef.put(currentSession, new HashSet<>());
                 })
                 .match(Message.Tick.class, tick -> {
@@ -115,7 +134,7 @@ public class TwitterActor extends AbstractActorWithTimers {
 
         for(String session: listOfSession) {
 
-            HashSet<String> keywords = sessionMapKeyword.get(session);
+            ArrayList<String> keywords = sessionMapKeyword.get(session);
             Set<ActorRef> userActors = sessionMapActorRef.get(session);
 
             CompletableFuture<List<SearchResults>> result = CompletableFuture.supplyAsync(() -> {
@@ -174,8 +193,6 @@ public class TwitterActor extends AbstractActorWithTimers {
                 .sorted((op1, op2) -> op1.getCreationTime().before(op2.getCreationTime())? 1 : -1 )
                 .limit(10)
                 .collect(Collectors.toList());
-
-
         return update;
     }
 

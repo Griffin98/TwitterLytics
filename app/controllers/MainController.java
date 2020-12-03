@@ -127,7 +127,7 @@ public class MainController extends Controller {
 		CompletableFuture<List<SearchResults>> oldResult = searchResultsMap.getSearchResultsMap().get(sessionId.get());
 
 		try {
-			Message.Keyword keyword = new Message.Keyword(searchKey);
+			Message.Keyword keyword = new Message.Keyword(searchKey,sessionId.get());
 			CompletionStage<Object> rs = ask(twitterActor, keyword, timeout);
 			CompletableFuture<CompletableFuture<List<SearchResults>>> tmp = rs
 					.thenApply(objects -> (CompletableFuture<List<SearchResults>>)objects)
@@ -163,8 +163,13 @@ public class MainController extends Controller {
 		if(index>=searchResultsMap.getListSearchResultsCount(sessionId.get()) || index<0){
 			return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Please provide a valid value",assetsFinder)));
 		}
-		tweetLyticsFactory = TweetLyticsFactory.getInstance(sessionTokenPair.get());
-		CompletableFuture<Map<String, Long>> futureStatistics= tweetLyticsFactory.findStatistics(searchResultsMap.getSearchResultsMap().get(sessionId.get()),index);
+		Message.FindStatistics findStatistics = new Message.FindStatistics(sessionId.get(),index);
+		CompletionStage<Object> rs = ask(twitterActor, findStatistics, timeout);
+		CompletableFuture<Map<String, Long>> futureStatistics = rs
+				.thenCompose(objects -> (CompletableFuture<Map<String, Long>>) objects)
+				.toCompletableFuture();
+//		tweetLyticsFactory = TweetLyticsFactory.getInstance(sessionTokenPair.get());
+//		CompletableFuture<Map<String, Long>> futureStatistics= tweetLyticsFactory.findStatistics(searchResultsMap.getSearchResultsMap().get(sessionId.get()),index);
 		return futureStatistics.thenApplyAsync(statistics->ok(views.html.tweetWords.render(statistics,assetsFinder)));
 	}
 

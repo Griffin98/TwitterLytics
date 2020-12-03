@@ -19,15 +19,18 @@ public class Message {
 
     public static final class Keyword{
         private String keyword;
-
+        private String sessionId;
         /**
          *
          * @param
          */
-        public Keyword(String keyword){
+        public Keyword(String keyword,String sessionId){
             this.keyword = requireNonNull(keyword);
+            this.sessionId=sessionId;
         }
-
+        public String getSessionId() {
+            return sessionId;
+        }
         public String getKeyword(){
             return keyword;
         }
@@ -57,7 +60,20 @@ public class Message {
             return this.tweets;
         }
     }
-
+    public static class FindStatistics{
+        final private String sessionId;
+        final private Integer index;
+        public FindStatistics(String sessionId,Integer index) {
+            this.sessionId = sessionId;
+            this.index=index;
+        }
+        public String getSessionId() {
+            return sessionId;
+        }
+        public Integer getIndex() {
+            return index;
+        }
+    }
 
     /**
      *
@@ -74,6 +90,5 @@ public class Message {
             return sessionId;
         }
     }
-
 
 }
