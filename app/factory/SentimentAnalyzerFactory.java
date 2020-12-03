@@ -50,14 +50,14 @@ public class SentimentAnalyzerFactory {
      * @param tweet the tweet
      * @return the string
      */
-    public String filterTweets(String tweet){
-        var counts =  Arrays.stream(tweet.split(" ")).map(this::classifyWord)
+    public  String filterTweets(String tweet){
+        Map<String, Long> counts =  Arrays.stream(tweet.split(" ")).map(this::classifyWord)
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         counts.remove("NA");
-      var total = counts.getOrDefault(":-)",0L) + counts.getOrDefault(":-(" , 0L);
-      var result = counts.entrySet().parallelStream()
+        long total = counts.getOrDefault(":-)",0L) + counts.getOrDefault(":-(" , 0L);
+        Map<String, Float> result = counts.entrySet().parallelStream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> (e.getValue() * 100.0f) / total));
-      if (result.getOrDefault(":-)", 0f) > 70.0f){
+        if (result.getOrDefault(":-)", 0f) > 70.0f){
             return ":-)";
         }else if(result.getOrDefault(":-(", 0f) > 70.0f){
             return ":-(";
@@ -72,14 +72,14 @@ public class SentimentAnalyzerFactory {
      * @param word the word
      * @return the string
      */
-    public String classifyWord(String word){
-        if(happyWords.contains(word)){
+    public  String classifyWord(String word){
+        if(happyWords.contains(word))
             return ":-)";
-        }else if (sadWords.contains(word)){
+        else if (sadWords.contains(word))
             return ":-(";
-        }else{
+        else
             return ":-|";
-        }
+
     }
 
     /**
@@ -88,7 +88,7 @@ public class SentimentAnalyzerFactory {
      * @param tweets the tweets
      * @return the list
      */
-    public List<String> getEmotionOfTweet(List<Tweet> tweets){
+    public  List<String> getEmotionOfTweet(List<Tweet> tweets){
         return tweets.stream()
                 .map((tweet) -> tweet.getText().toLowerCase().trim())
                 .map(this::filterTweets)
@@ -102,9 +102,9 @@ public class SentimentAnalyzerFactory {
      * @return the result of all tweet
      */
     public String getResultOfAllTweet(List<String> sentiment) {
-        var happyEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-)")).count();
-        var sadEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-(")).count();
-        var neutralEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-|")).count();
+        long happyEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-)")).count();
+        long sadEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-(")).count();
+        long neutralEmoticon = sentiment.stream().filter(emoticon -> emoticon.equals(":-|")).count();
         if (happyEmoticon > sadEmoticon && happyEmoticon > neutralEmoticon){
             return ":-)";
         }else if (sadEmoticon > happyEmoticon &&  sadEmoticon > neutralEmoticon){

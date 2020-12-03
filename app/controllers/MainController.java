@@ -264,5 +264,4 @@ public class MainController extends Controller {
 				ActorFlow.actorRef(UserActor::props,actorSystem, materializer ));
 	}
 
-
 }

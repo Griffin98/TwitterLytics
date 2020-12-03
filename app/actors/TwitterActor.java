@@ -3,19 +3,14 @@ package actors;
 import akka.actor.AbstractActorWithTimers;
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import factory.SentimentAnalyzerFactory;
+import akka.pattern.Patterns;
 import factory.TweetLyticsFactory;
-import model.SearchData;
 import model.SearchResults;
 import model.Tweet;
 import play.libs.oauth.OAuth.RequestToken;
+import scala.compat.java8.FutureConverters;
 import scala.concurrent.duration.Duration;
-import services.TwitterAPIService;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.ConfigurationBuilder;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +29,7 @@ public class TwitterActor extends AbstractActorWithTimers {
     private HashMap<String, ArrayList<String>> sessionMapKeyword;
     private HashMap<String, List<SearchResults>> sessionMapSearchResults;
     private HashMap<String, Set<ActorRef>> sessionMapActorRef;
-
+    private ActorRef sentimentAnalyzerActor;
     private final TweetLyticsFactory tweetLyticsFactory;
 
     play.Logger.ALogger logger = play.Logger.of(getClass());
@@ -49,6 +44,7 @@ public class TwitterActor extends AbstractActorWithTimers {
         this.sessionMapActorRef = new HashMap<>();
         this.sessionMapKeyword = new HashMap<>();
         this.sessionMapSearchResults=new HashMap<>();
+        this.sentimentAnalyzerActor = this.getContext().getSystem().actorOf(SentimentAnalyzerActor.getProps());
     }
 
 
@@ -150,12 +146,18 @@ public class TwitterActor extends AbstractActorWithTimers {
                                 List<Tweet> diff = getUpdate(now, before);
                                 history.put(key, diff);
 
-                                SentimentAnalyzerFactory sentimentAnalyzerFactory = new SentimentAnalyzerFactory();
-                                List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(diff);
-                                String overallResult = sentimentAnalyzerFactory.getResultOfAllTweet(resultsIndividualTweets);
-                                diff.forEach(u -> u.setTweetSentiment(resultsIndividualTweets));
+                                List<String> singleTweetResult =  FutureConverters.toJava(Patterns.ask(sentimentAnalyzerActor, new SentimentAnalyzerActor.GetSingleTweetResult(diff), 5000))
+                                        .thenApply(o -> (List<String>) o).toCompletableFuture().join();
 
-                                SearchResults searchResults = new SearchResults(key, diff, overallResult);
+                                String allResult =  FutureConverters.toJava(Patterns.ask(sentimentAnalyzerActor, new SentimentAnalyzerActor.GetOverallTweetResult(singleTweetResult), 5000))
+                                        .thenApply(o -> (String) o)
+                                        .toCompletableFuture().join();
+//                                SentimentAnalyzerFactory sentimentAnalyzerFactory = new SentimentAnalyzerFactory();
+//                                List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(diff);
+//                                String overallResult = sentimentAnalyzerFactory.getResultOfAllTweet(resultsIndividualTweets);
+                                diff.forEach(u -> u.setTweetSentiment(singleTweetResult));
+
+                                SearchResults searchResults = new SearchResults(key, diff, allResult);
                                 results.add(searchResults);
 
                             });
