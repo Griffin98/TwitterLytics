@@ -146,14 +146,14 @@ public class TwitterActor extends AbstractActorWithTimers {
                                 List<Tweet> diff = getUpdate(now, before);
                                 history.put(key, diff);
 
-                                List<String> singleTweetResult =  FutureConverters.toJava(Patterns.ask(sentimentAnalyzerActor, new SentimentAnalyzerActor.GetSingleTweetResult(diff), 5000))
+                                List<String> singleTweetResult =  FutureConverters.toJava(Patterns.ask(sentimentAnalyzerActor, new Message.GetSingleTweetResult(diff), 5000))
                                         .thenApply(o -> (List<String>) o).toCompletableFuture().join();
 
-                                String allResult =  FutureConverters.toJava(Patterns.ask(sentimentAnalyzerActor, new SentimentAnalyzerActor.GetOverallTweetResult(singleTweetResult), 5000))
+                                String allResult =  FutureConverters.toJava(Patterns.ask(sentimentAnalyzerActor, new Message.GetOverallTweetResult(singleTweetResult), 5000))
                                         .thenApply(o -> (String) o)
                                         .toCompletableFuture().join();
 //                                SentimentAnalyzerFactory sentimentAnalyzerFactory = new SentimentAnalyzerFactory();
-//                                List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(diff);
+//                                  List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(diff);
 //                                String overallResult = sentimentAnalyzerFactory.getResultOfAllTweet(resultsIndividualTweets);
                                 diff.forEach(u -> u.setTweetSentiment(singleTweetResult));
 

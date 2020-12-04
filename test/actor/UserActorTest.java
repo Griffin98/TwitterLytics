@@ -1,30 +1,31 @@
 package actor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.testkit.TestActorRef;
+import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import play.libs.oauth.OAuth;
 import actors.*;
 import model.*;
+
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 
-public class userActorTest {
+public class UserActorTest {
     static ActorSystem actorSystem;
     private ActorRef userActor;
-    @BeforeClass
-    public static void setup() {
+    @Before
+    public  void setup() {
         actorSystem = ActorSystem.create();
     }
-    @AfterClass
-    public static void teardown() {
+    @After
+    public void teardown() {
         TestKit.shutdownActorSystem(actorSystem);
         actorSystem = null;
     }
@@ -56,6 +57,7 @@ public class userActorTest {
         CompletableFuture<List<SearchResults>> listCompletableFuture=CompletableFuture.supplyAsync(()->listSearchResults);
         userActor.tell(new Message.Update(listCompletableFuture),testProbe.getRef());
         testProbe.expectNoMsg();
+
     }
 
 }

@@ -4,24 +4,23 @@ import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.junit.*;
 import play.libs.oauth.OAuth;
 import actors.*;
 
 import java.util.concurrent.CompletableFuture;
 
 
-public class twitterActorTest {
+public class TwitterActorTest {
     static ActorSystem actorSystem;
     private ActorRef twitterActor;
-    @BeforeClass
-    public static void setup() {
+    @Before
+    public void setup() {
         actorSystem = ActorSystem.create();
     }
-    @AfterClass
-    public static void teardown() {
+    @After
+    public  void teardown() {
         TestKit.shutdownActorSystem(actorSystem);
         actorSystem = null;
     }

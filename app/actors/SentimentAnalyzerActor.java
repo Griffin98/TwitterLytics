@@ -32,41 +32,21 @@ public class SentimentAnalyzerActor extends AbstractActor {
         return Props.create(SentimentAnalyzerActor.class, SentimentAnalyzerActor::new);
     }
 
-    public static final class GetSingleTweetResult {
-
-        private List<Tweet> tweet;
-
-        public GetSingleTweetResult(List<Tweet> tweet) {
-            this.tweet = tweet;
-        }
-
-    }
-
-    public static final class GetOverallTweetResult {
-
-        private List<String> overallResult;
-
-        public GetOverallTweetResult(List<String> overallResult) {
-            this.overallResult = overallResult;
-        }
-
-    }
-
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(GetSingleTweetResult.class, this::onGetSingleTweetResult)
-                .match(GetOverallTweetResult.class, this::onGetOverallTweetResult)
+                .match(Message.GetSingleTweetResult.class, this::onGetSingleTweetResult)
+                .match(Message.GetOverallTweetResult.class, this::onGetOverallTweetResult)
                 .build();
     }
 
-    private void onGetSingleTweetResult(GetSingleTweetResult singleResult) {
-        List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(singleResult.tweet);
+    private void onGetSingleTweetResult(Message.GetSingleTweetResult singleResult) {
+        List<String> resultsIndividualTweets = sentimentAnalyzerFactory.getEmotionOfTweet(singleResult.getTweet());
         getSender().tell(resultsIndividualTweets, getSelf());
     }
 
-    private void onGetOverallTweetResult(GetOverallTweetResult overallTweetResult){
-        String overallResult = sentimentAnalyzerFactory.getResultOfAllTweet(overallTweetResult.overallResult);
+    private void onGetOverallTweetResult(Message.GetOverallTweetResult overallTweetResult){
+        String overallResult = sentimentAnalyzerFactory.getResultOfAllTweet(overallTweetResult.getOverallResult());
         getSender().tell(overallResult, getSelf());
     }
 

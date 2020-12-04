@@ -1,6 +1,7 @@
 package actors;
 
 import model.SearchResults;
+import model.Tweet;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -90,5 +91,34 @@ public class Message {
             return sessionId;
         }
     }
+
+    public static final class GetSingleTweetResult {
+
+        public List<Tweet> getTweet() {
+            return tweet;
+        }
+
+        private final List<Tweet> tweet;
+
+        public GetSingleTweetResult(List<Tweet> tweet) {
+            this.tweet = tweet;
+        }
+
+    }
+
+    public static final class GetOverallTweetResult {
+
+        private final List<String> overallResult;
+
+        public List<String> getOverallResult() {
+            return overallResult;
+        }
+
+        public GetOverallTweetResult(List<String> overallResult) {
+            this.overallResult = overallResult;
+        }
+
+    }
+
 
 }
