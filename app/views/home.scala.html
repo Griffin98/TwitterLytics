@@ -56,7 +56,7 @@
             }
               </style>
             </head>
-            <body data-ws-url="@routes.MainController.ws.webSocketURL(request)">
+            <body data-ws-url="@routes.MainController.ws("normal").webSocketURL(request)">
 
                 <header class="w3-container w3-center" style="padding:16px 16px">
                     <h1 class="w3-margin w3-xxlarg">Welcome to, <span class="w3-myfont w3-jumbo">TweetLytics</span></h1>

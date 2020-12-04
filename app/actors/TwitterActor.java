@@ -32,6 +32,9 @@ public class TwitterActor extends AbstractActorWithTimers {
     private ActorRef sentimentAnalyzerActor;
     private final TweetLyticsFactory tweetLyticsFactory;
 
+    private String currentSearchHashtag = null;
+    private Set<ActorRef> hashtagActorRef;
+
     play.Logger.ALogger logger = play.Logger.of(getClass());
 
     public TwitterActor(RequestToken token) {
@@ -45,6 +48,8 @@ public class TwitterActor extends AbstractActorWithTimers {
         this.sessionMapKeyword = new HashMap<>();
         this.sessionMapSearchResults=new HashMap<>();
         this.sentimentAnalyzerActor = this.getContext().getSystem().actorOf(SentimentAnalyzerActor.getProps());
+
+        this.hashtagActorRef = new HashSet<>();
     }
 
 
@@ -71,10 +76,17 @@ public class TwitterActor extends AbstractActorWithTimers {
                 .match(Message.Register.class, msg -> {
                     logger.error("Received new user");
 
-                    Set<ActorRef> actorRefSet = sessionMapActorRef.get(currentSession);
-                    actorRefSet.add(sender());
-                    sessionMapActorRef.put(currentSession, actorRefSet);
-                    //userActors.add(sender());
+                    if(msg.getRegistrationType() == Message.TYPE.HASHTAG) {
+                        logger.error("Registered hashtag actor");
+                        hashtagActorRef.add(sender());
+                    } else {
+                        logger.error("Registered user actor");
+                        Set<ActorRef> actorRefSet = sessionMapActorRef.get(currentSession);
+                        actorRefSet.add(sender());
+                        sessionMapActorRef.put(currentSession, actorRefSet);
+                        //userActors.add(sender());
+                    }
+
                 })
                 .match(Message.FindStatistics.class, msg -> {
                     logger.error("Finding statistics for index:",msg.getIndex());
@@ -94,12 +106,17 @@ public class TwitterActor extends AbstractActorWithTimers {
                     logger.error("Received message");
                     logger.error(msg.getKeyword());
 
-                    ArrayList<String> key = sessionMapKeyword.get(currentSession);
+                    if(msg.getMessageType() == Message.TYPE.HASHTAG) {
+                        logger.error("Tag: " + msg.getKeyword());
+                        currentSearchHashtag = msg.getKeyword();
+                    } else {
+                        ArrayList<String> key = sessionMapKeyword.get(currentSession);
 //                    ArrayList<String> key = sessionMapKeyword.get(msg.getSessionId());
-                    key.add(msg.getKeyword());
-                    sessionMapKeyword.put(currentSession, key);
+                        key.add(msg.getKeyword());
+                        sessionMapKeyword.put(currentSession, key);
 //                    sessionMapKeyword.put(msg.getSessionId(), key);
-                    //keywords.add(msg.getKeyword());
+                        //keywords.add(msg.getKeyword());
+                    }
 
                     CompletableFuture<List<SearchResults>>  results = tweetLyticsFactory.getTweetsByKeyword(msg.getKeyword())
                             .thenApply(res -> {
@@ -121,6 +138,7 @@ public class TwitterActor extends AbstractActorWithTimers {
                 })
                 .match(Message.Tick.class, tick -> {
                     notifyUsers();
+                    notifyHashtags();
                 })
                 .build();
     }
@@ -179,6 +197,20 @@ public class TwitterActor extends AbstractActorWithTimers {
 
 
 
+    }
+
+    private void notifyHashtags() {
+
+        if(currentSearchHashtag == null) {
+            currentSearchHashtag = "#";
+        }
+
+        for(ActorRef ref : hashtagActorRef) {
+
+            CompletableFuture<List<SearchResults>> result= tweetLyticsFactory.getTweetsByKeyword(currentSearchHashtag);
+
+            ref.tell(new Message.Update(result), self());
+        }
     }
 
     /**

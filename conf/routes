@@ -5,7 +5,7 @@
 # Home page
 
 GET     /                           controllers.MainController.index
-GET		/ws			                controllers.MainController.ws
+GET		/ws			                controllers.MainController.ws(type : String)
 
 GET     /twitter/auth               controllers.MainController.auth(request : Request)
 GET     /home                       controllers.MainController.main(request : Request)
@@ -13,7 +13,6 @@ GET     /search                     controllers.MainController.search(request : 
 GET     /tweetWords                 controllers.MainController.tweetWords(index: Integer,request : Request)
 GET     /searchHashTags             controllers.MainController.searchHashTags(tag : String, request : Request)
 GET     /userProfile                controllers.MainController.userProfile(userId: Long,request : Request)
-GET     /profile                    controllers.MainController.profile(request : Request)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

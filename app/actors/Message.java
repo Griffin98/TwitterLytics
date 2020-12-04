@@ -12,6 +12,14 @@ public class Message {
 
     public static final class Register{
 
+        private TYPE type;
+
+        public Register(TYPE type) {
+            this.type = type;
+        }
+
+        public TYPE getRegistrationType() {return type;}
+
     }
 
     public static final class Tick{
@@ -21,13 +29,17 @@ public class Message {
     public static final class Keyword{
         private String keyword;
         private String sessionId;
+
+        private TYPE messageType;
         /**
          *
          * @param
          */
-        public Keyword(String keyword,String sessionId){
+        public Keyword(String keyword,String sessionId, TYPE t){
             this.keyword = requireNonNull(keyword);
             this.sessionId=sessionId;
+            this.messageType = t;
+
         }
         public String getSessionId() {
             return sessionId;
@@ -35,6 +47,12 @@ public class Message {
         public String getKeyword(){
             return keyword;
         }
+
+        public TYPE getMessageType() {
+            return messageType;
+        }
+
+
     }
 
     /**
@@ -119,6 +137,8 @@ public class Message {
         }
 
     }
+
+    public enum TYPE { HASHTAG, KEYWORD };
 
 
 }

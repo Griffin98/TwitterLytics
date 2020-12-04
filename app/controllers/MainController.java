@@ -1,5 +1,6 @@
 package controllers;
 
+import actors.HashtagActor;
 import actors.Message;
 import actors.TwitterActor;
 import actors.UserActor;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static akka.pattern.PatternsCS.ask;
@@ -127,7 +129,7 @@ public class MainController extends Controller {
 		CompletableFuture<List<SearchResults>> oldResult = searchResultsMap.getSearchResultsMap().get(sessionId.get());
 
 		try {
-			Message.Keyword keyword = new Message.Keyword(searchKey,sessionId.get());
+			Message.Keyword keyword = new Message.Keyword(searchKey,sessionId.get(), Message.TYPE.KEYWORD);
 			CompletionStage<Object> rs = ask(twitterActor, keyword, timeout);
 			CompletableFuture<CompletableFuture<List<SearchResults>>> tmp = rs
 					.thenApply(objects -> (CompletableFuture<List<SearchResults>>)objects)
@@ -185,8 +187,19 @@ public class MainController extends Controller {
 		if(!sessionTokenPair.isPresent() || !sessionId.isPresent()){
 			return CompletableFuture.supplyAsync(()->badRequest(views.html.errorView.render("Invalid session",assetsFinder)));
 		}
-		tweetLyticsFactory = TweetLyticsFactory.getInstance(sessionTokenPair.get());
-		CompletableFuture<List<SearchResults>> results = tweetLyticsFactory.getTweetsByKeyword(tag);
+		Message.Keyword keyword = new Message.Keyword(tag,sessionId.get(), Message.TYPE.HASHTAG);
+		CompletionStage<Object> rs = ask(twitterActor, keyword, timeout);
+		CompletableFuture<CompletableFuture<List<SearchResults>>> tmp = rs
+				.thenApply(objects -> (CompletableFuture<List<SearchResults>>)objects)
+				.toCompletableFuture();
+
+		CompletableFuture<List<SearchResults>> results = null;
+		try {
+			results = tmp.get();
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage());
+		}
+
 		return results.thenApplyAsync(result ->
 				ok(views.html.hashTags.render(asScala(result), assetsFinder,request, messagesApi.preferred(request))
 				));
@@ -255,13 +268,17 @@ public class MainController extends Controller {
 				.map(token -> new OAuth.RequestToken(token, request.session().get("secret").get()));
 	}
 
-	public Result profile(Http.Request request) {
-		return ok(userProfileTest.render(request));
-	}
+	public WebSocket ws(String type) {
 
-	public WebSocket ws() {
-		return WebSocket.Json.accept(request ->
-				ActorFlow.actorRef(UserActor::props,actorSystem, materializer ));
+		if(type.equals("hashtag")) {
+			return WebSocket.Json.accept(request ->
+					ActorFlow.actorRef(HashtagActor::props, actorSystem, materializer));
+		}
+		else {
+			return WebSocket.Json.accept(request ->
+					ActorFlow.actorRef(UserActor::props,actorSystem, materializer ));
+		}
+
 	}
 
 }

@@ -9,11 +9,10 @@ import model.SearchResults;
 import model.Tweet;
 import play.libs.Json;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class UserActor  extends AbstractActor {
+public class HashtagActor extends AbstractActor {
 
     private final ActorRef ws;
     play.Logger.ALogger logger = play.Logger.of(getClass());
@@ -23,7 +22,7 @@ public class UserActor  extends AbstractActor {
      * Constructor
      * @param wsOut pass the reference of the UserActor.
      */
-    public UserActor(final ActorRef wsOut){
+    public HashtagActor(final ActorRef wsOut){
         this.ws = wsOut;
     }
 
@@ -33,7 +32,7 @@ public class UserActor  extends AbstractActor {
      * @return An ActorRef of UserActor
      */
     public static Props props(final ActorRef wsOut){
-        return Props.create(UserActor.class, wsOut);
+        return Props.create(HashtagActor.class, wsOut);
     }
 
 
@@ -44,7 +43,7 @@ public class UserActor  extends AbstractActor {
     public void preStart(){
         logger.error("User Actor Registered");
         context().actorSelection("/user/twitterActor")
-                .tell(new Message.Register(Message.TYPE.KEYWORD), self());
+                .tell(new Message.Register(Message.TYPE.HASHTAG), self());
     }
 
     @Override
