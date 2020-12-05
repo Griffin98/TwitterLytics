@@ -32,9 +32,9 @@ public class TwitterActorTest {
         twitterActor = actorSystem.actorOf(TwitterActor.getProps(tempToken), "twitterActor");
         twitterActor.tell(new Message.Session("dummysession"),testProbe.getRef());
         testProbe.expectNoMsg();
-        twitterActor.tell(new Message.Register(), testProbe.getRef());
+        twitterActor.tell(new Message.Register(Message.TYPE.KEYWORD,"dummysession"), testProbe.getRef());
         testProbe.expectNoMsg();
-        twitterActor.tell(new Message.Keyword("hello","testSessionId"), testProbe.getRef());
+        twitterActor.tell(new Message.Keyword("hello","testSessionId",Message.TYPE.KEYWORD), testProbe.getRef());
         testProbe.expectMsgClass(CompletableFuture.class);
         twitterActor.tell(new Message.Tick(), testProbe.getRef());
         testProbe.expectMsgClass(Message.Update.class);

@@ -34,7 +34,7 @@ public class UserActorTest {
         OAuth.RequestToken tempToken = new OAuth.RequestToken("804992947015929857-DhDb94zyLSUkZLkXBprs48w9diAMPy9",
                 "t9LOxQbuAuAN0R4rw2Xq7KKZpXw54cECifvxDzAXBD0EM");
         final TestKit testProbe = new TestKit(actorSystem);
-        userActor = actorSystem.actorOf(UserActor.props(testProbe.getRef()), "userActor");
+        userActor = actorSystem.actorOf(UserActor.props(testProbe.getRef(),"dummysessionId"), "userActor");
         User user = new User(1, "User", "screenName", "userprofile", "useProfile");
         Date date = new Date();
         ArrayList<String> hashTags = new ArrayList<>();
