@@ -17,14 +17,15 @@ public class UserActor  extends AbstractActor {
 
     private final ActorRef ws;
     play.Logger.ALogger logger = play.Logger.of(getClass());
-
+    private final String sessionId;
 
     /**
      * Constructor
      * @param wsOut pass the reference of the UserActor.
      */
-    public UserActor(final ActorRef wsOut){
+    public UserActor(final ActorRef wsOut,String sessionId){
         this.ws = wsOut;
+        this.sessionId=sessionId;
     }
 
     /**
@@ -32,8 +33,8 @@ public class UserActor  extends AbstractActor {
      * @param wsOut ActorRef
      * @return An ActorRef of UserActor
      */
-    public static Props props(final ActorRef wsOut){
-        return Props.create(UserActor.class, wsOut);
+    public static Props props(final ActorRef wsOut,String sessionId){
+        return Props.create(UserActor.class, ()->new UserActor(wsOut,sessionId));
     }
 
 
@@ -44,7 +45,7 @@ public class UserActor  extends AbstractActor {
     public void preStart(){
         logger.error("User Actor Registered");
         context().actorSelection("/user/twitterActor")
-                .tell(new Message.Register(Message.TYPE.KEYWORD), self());
+                .tell(new Message.Register(Message.TYPE.KEYWORD,this.sessionId), self());
     }
 
     @Override

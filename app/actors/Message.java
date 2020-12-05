@@ -13,13 +13,15 @@ public class Message {
     public static final class Register{
 
         private TYPE type;
-
-        public Register(TYPE type) {
+        private final String sessionId;
+        public Register(TYPE type,String sessionId) {
+            this.sessionId=sessionId;
             this.type = type;
         }
-
         public TYPE getRegistrationType() {return type;}
-
+        public String getSessionId() {
+            return sessionId;
+        }
     }
 
     public static final class Tick{

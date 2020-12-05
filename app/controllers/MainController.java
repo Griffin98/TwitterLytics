@@ -268,17 +268,23 @@ public class MainController extends Controller {
 				.map(token -> new OAuth.RequestToken(token, request.session().get("secret").get()));
 	}
 
-	public WebSocket ws(String type) {
-
+//	public WebSocket ws(String type,Http.Request req) {
+public WebSocket ws(String type) {
+//		String sessionId=session().get("session_id");
 		if(type.equals("hashtag")) {
-			return WebSocket.Json.accept(request ->
-					ActorFlow.actorRef(HashtagActor::props, actorSystem, materializer));
+			return WebSocket.Json.accept(request ->{
+				Optional<String> session_id = request.session().get("session_id");
+				return ActorFlow.actorRef(wsOut->UserActor.props(wsOut,session_id.get()), actorSystem, materializer);
+			});
 		}
 		else {
-			return WebSocket.Json.accept(request ->
-					ActorFlow.actorRef(UserActor::props,actorSystem, materializer ));
+			return WebSocket.Json.accept(request ->{
+				Optional<String> session_id = request.session().get("session_id");
+//				Optional<OAuth.RequestToken> sessionTokenPair = getSessionTokenPair(req);
+//				Optional<String> sessionId = req.session().get("session_id");
+				return ActorFlow.actorRef(wsOut->UserActor.props(wsOut,session_id.get()),actorSystem, materializer );
+			});
 		}
-
 	}
 
 }

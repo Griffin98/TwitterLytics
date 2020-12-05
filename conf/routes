@@ -5,8 +5,8 @@
 # Home page
 
 GET     /                           controllers.MainController.index
+#GET		/ws			                controllers.MainController.ws(type : String,request : Request)
 GET		/ws			                controllers.MainController.ws(type : String)
-
 GET     /twitter/auth               controllers.MainController.auth(request : Request)
 GET     /home                       controllers.MainController.main(request : Request)
 GET     /search                     controllers.MainController.search(request :  Request)

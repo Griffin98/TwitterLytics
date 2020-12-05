@@ -74,16 +74,16 @@ public class TwitterActor extends AbstractActorWithTimers {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(Message.Register.class, msg -> {
-                    logger.error("Received new user");
+//                    logger.error("Received new user");
 
                     if(msg.getRegistrationType() == Message.TYPE.HASHTAG) {
                         logger.error("Registered hashtag actor");
                         hashtagActorRef.add(sender());
                     } else {
                         logger.error("Registered user actor");
-                        Set<ActorRef> actorRefSet = sessionMapActorRef.get(currentSession);
+                        Set<ActorRef> actorRefSet = sessionMapActorRef.get(msg.getSessionId());
                         actorRefSet.add(sender());
-                        sessionMapActorRef.put(currentSession, actorRefSet);
+                        sessionMapActorRef.put(msg.getSessionId(), actorRefSet);
                         //userActors.add(sender());
                     }
 
@@ -110,11 +110,11 @@ public class TwitterActor extends AbstractActorWithTimers {
                         logger.error("Tag: " + msg.getKeyword());
                         currentSearchHashtag = msg.getKeyword();
                     } else {
-                        ArrayList<String> key = sessionMapKeyword.get(currentSession);
-//                    ArrayList<String> key = sessionMapKeyword.get(msg.getSessionId());
+//                        ArrayList<String> key = sessionMapKeyword.get(currentSession);
+                    ArrayList<String> key = sessionMapKeyword.get(msg.getSessionId());
                         key.add(msg.getKeyword());
-                        sessionMapKeyword.put(currentSession, key);
-//                    sessionMapKeyword.put(msg.getSessionId(), key);
+//                        sessionMapKeyword.put(currentSession, key);
+                    sessionMapKeyword.put(msg.getSessionId(), key);
                         //keywords.add(msg.getKeyword());
                     }
 
@@ -122,8 +122,8 @@ public class TwitterActor extends AbstractActorWithTimers {
                             .thenApply(res -> {
                                 List<Tweet> t = res.get(0).getTweets();
                                 history.put(msg.getKeyword(), t);
-                                sessionMapSearchResults.put(currentSession,res);
-//                                sessionMapSearchResults.put(msg.getSessionId(),res);
+//                                sessionMapSearchResults.put(currentSession,res);
+                                sessionMapSearchResults.put(msg.getSessionId(),res);
                                 return res;
                             });
 
@@ -132,9 +132,9 @@ public class TwitterActor extends AbstractActorWithTimers {
                 .match(Message.Session.class ,msg -> {
                     logger.error("Session started : ", msg.getSessionId());
                     currentSession = msg.getSessionId();
-                    listOfSession.add(currentSession);
-                    sessionMapKeyword.put(currentSession, new ArrayList<>());
-                    sessionMapActorRef.put(currentSession, new HashSet<>());
+                    listOfSession.add(msg.getSessionId());
+                    sessionMapKeyword.put(msg.getSessionId(), new ArrayList<>());
+                    sessionMapActorRef.put(msg.getSessionId(), new HashSet<>());
                 })
                 .match(Message.Tick.class, tick -> {
                     notifyUsers();

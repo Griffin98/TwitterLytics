@@ -16,13 +16,14 @@ public class HashtagActor extends AbstractActor {
 
     private final ActorRef ws;
     play.Logger.ALogger logger = play.Logger.of(getClass());
-
+    private final String sessionId;
 
     /**
      * Constructor
      * @param wsOut pass the reference of the UserActor.
      */
-    public HashtagActor(final ActorRef wsOut){
+    public HashtagActor(final ActorRef wsOut,String sessionId){
+        this.sessionId=sessionId;
         this.ws = wsOut;
     }
 
@@ -31,8 +32,8 @@ public class HashtagActor extends AbstractActor {
      * @param wsOut ActorRef
      * @return An ActorRef of UserActor
      */
-    public static Props props(final ActorRef wsOut){
-        return Props.create(HashtagActor.class, wsOut);
+    public static Props props(final ActorRef wsOut,String sessionId){
+        return Props.create(HashtagActor.class, ()->new HashtagActor(wsOut,sessionId));
     }
 
 
@@ -43,7 +44,7 @@ public class HashtagActor extends AbstractActor {
     public void preStart(){
         logger.error("User Actor Registered");
         context().actorSelection("/user/twitterActor")
-                .tell(new Message.Register(Message.TYPE.HASHTAG), self());
+                .tell(new Message.Register(Message.TYPE.HASHTAG,sessionId), self());
     }
 
     @Override
